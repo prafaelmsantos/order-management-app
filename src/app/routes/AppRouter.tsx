@@ -1,17 +1,17 @@
 import { Navigate, useRoutes } from "react-router";
 import Dashboard from "../pages/dashboard/DashboardPage";
-import ClientsPage from "../pages/clients/ClientsPage";
+import ClientsPage from "../pages/customers/ClientsPage";
 import DashboardLayout from "../components/DashboardLayout";
 import EmployeeShow from "../pages/clients/components/EmployeeShow";
 import EmployeeCreate from "../pages/clients/components/EmployeeCreate";
 import EmployeeEdit from "../pages/clients/components/EmployeeEdit";
-import ClientForm from "../pages/clients/components/form/ClientForm";
+import ClientForm from "../pages/customers/components/form/CustomerForm";
 import EmployeeForm from "../pages/clients/components/EmployeeForm";
-import CreateClient from "../pages/clients/components/CreateClient";
 import ProductsPage from "../pages/products/ProductsPage";
 import CreateProduct from "../pages/products/components/CreateProduct";
 import OrdersPage from "../pages/orders/OrdersPage";
 import CreateOrder from "../pages/orders/components/CreateOrder";
+import CreateCustomer from "../pages/customers/components/CreateCustomer";
 
 export default function AppRouter() {
   const Routes = [
@@ -27,10 +27,10 @@ export default function AppRouter() {
         { path: "/products/:productId", element: <EmployeeShow /> },
         { path: "/products/new", element: <CreateProduct /> },
 
-        { path: "/clients", element: <ClientsPage /> },
-        { path: "/clients/:clientId", element: <EmployeeShow /> },
-        { path: "/clients/new", element: <CreateClient /> },
-        { path: "/clients/:clientId/edit", element: <EmployeeEdit /> },
+        { path: "/customers", element: <ClientsPage /> },
+        { path: "/customers/:customerId", element: <EmployeeShow /> },
+        { path: "/clients/new", element: <CreateCustomer /> },
+        { path: "/customers/:customerId/edit", element: <EmployeeEdit /> },
         { path: "*", element: <Navigate to="/" replace /> }
       ]
     }

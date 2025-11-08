@@ -10,7 +10,7 @@ export enum NavType {
   Home = "Início",
   Orders = "Encomendas",
   Products = "Produtos",
-  Clients = "Clientes"
+  Customers = "Clientes"
 }
 
 export interface Nav {
@@ -23,5 +23,5 @@ export const NavItems: Nav[] = [
   { name: NavType.Home, icon: DashboardIcon, href: "/" },
   { name: NavType.Orders, icon: ShoppingCartIcon, href: "/orders" },
   { name: NavType.Products, icon: InventoryIcon, href: "/products" },
-  { name: NavType.Clients, icon: PeopleIcon, href: "/clients" }
+  { name: NavType.Customers, icon: PeopleIcon, href: "/customers" }
 ];

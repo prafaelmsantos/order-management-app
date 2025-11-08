@@ -1,15 +1,8 @@
 import { Controller, useFormContext } from "react-hook-form";
-import {
-  Autocomplete,
-  Button,
-  MenuItem,
-  TextField,
-  Typography
-} from "@mui/material";
+import { Autocomplete, MenuItem, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import { mockClients } from "../../../clients/data/clients";
 import { IOrderSchema } from "../../services/OrderSchema";
-import { Products } from "../../../products/Products";
 
 export default function OrderForm() {
   const {
@@ -63,7 +56,7 @@ export default function OrderForm() {
               {...field}
               multiple
               onChange={(_, value) => field.onChange(value)}
-              options={Products}
+              options={[]}
               getOptionLabel={(option) =>
                 `${option.description} (${option.reference})`
               }

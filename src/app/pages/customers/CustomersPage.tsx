@@ -11,28 +11,26 @@ import { useDialogs } from "../../context/useDialogs/useDialogs";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/custom-data-grid";
-import columns from "./components/grid/ProductColumns";
-import { IProduct } from "./models/Product";
-import { useEffect, useState } from "react";
-import { getProducts } from "./services/ProductService";
+import { ICustomer } from "./models/Customer";
+import columns from "./components/grid/CustomerColumns";
 
-export default function ProductsPage() {
+export default function CustomersPage() {
   const navigate = useNavigate();
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
   const handleCreateClick = React.useCallback(() => {
-    navigate("/products/new");
+    navigate("/customers/new");
   }, [navigate]);
 
   const handleRowEdit = (id: number) => {
-    navigate(`/clients/${id}/edit`);
+    navigate(`/customers/${id}/edit`);
   };
 
-  const handleRowDelete = async (employee: IProduct) => {
+  const handleRowDelete = async (customer: ICustomer) => {
     const confirmed = await dialogs.confirm(
-      `Do you wish to delete ${employee.reference}?`,
+      `Do you wish to delete ${customer.fullName}?`,
       {
         title: `Delete employee?`,
         severity: "error",
@@ -43,6 +41,8 @@ export default function ProductsPage() {
 
     if (confirmed) {
       try {
+        //await deleteEmployee(Number(employee.id));
+
         notifications.show("Employee deleted successfully.", {
           severity: "success",
           autoHideDuration: 3000
@@ -62,22 +62,10 @@ export default function ProductsPage() {
     }
   };
 
-  const [products, setProducts] = useState<IProduct[]>([]);
-
-  useEffect(() => {
-    getProducts()
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  }, []);
-
   return (
     <PageContainer
-      title={"Produtos"}
-      breadcrumbs={[{ title: "Produtos" }]}
+      title={"Clientes"}
+      breadcrumbs={[{ title: "Clientes" }]}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
@@ -100,7 +88,7 @@ export default function ProductsPage() {
       <Box sx={{ flex: 1, width: "100%" }}>
         <CustomDataGrid
           columns={columns(handleRowEdit, handleRowDelete)}
-          rows={products}
+          rows={mockClients}
           loading={false}
         />
       </Box>

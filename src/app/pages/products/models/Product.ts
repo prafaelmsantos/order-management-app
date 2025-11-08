@@ -1,17 +1,15 @@
 export interface IProduct {
-  id: string;
+  id: number;
   reference: string;
-  color: string;
-  price: number;
-  quantity: number;
-  description: string;
+  description?: string;
+  unitPrice: number;
+  createdAt: Date;
 }
 
 export enum ProductKeys {
   id = "id",
   reference = "reference",
   description = "description",
-  quantity = "quantity",
-  color = "color",
-  price = "price"
+  unitPrice = "unitPrice",
+  createdAt = "createdAt"
 }

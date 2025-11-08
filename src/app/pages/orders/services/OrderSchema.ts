@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { clientSchema } from "../../clients/services/ClientSchema";
+import { clientSchema } from "../../customers/services/ClientSchema";
 import { productSchema } from "../../products/services/ProductSchema";
 
 // Schema do estado da encomenda

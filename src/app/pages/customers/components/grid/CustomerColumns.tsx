@@ -5,34 +5,39 @@ import {
 } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { IProduct, ProductKeys } from "../../models/Product";
+import { CustomerKeys, ICustomer } from "../../models/Customer";
 
-export default function productColumns(
+export default function columns(
   handleRowEdit: (id: number) => void,
-  handleRowDelete: (product: IProduct) => void
-): GridColDef<IProduct>[] {
+  handleRowDelete: (client: ICustomer) => void
+): GridColDef<ICustomer>[] {
   return [
     {
-      field: ProductKeys.id,
+      field: CustomerKeys.id,
       headerName: "#",
-      width: 100
+      width: 70
     },
     {
-      field: ProductKeys.reference,
-      headerName: "Referência",
+      field: CustomerKeys.fullName,
+      headerName: "Nome Completo",
       flex: 1,
       minWidth: 100
     },
     {
-      field: ProductKeys.description,
-      headerName: "Descrição",
-      flex: 1,
-      minWidth: 150
+      field: CustomerKeys.taxIdentificationNumber,
+      headerName: "NIF",
+      width: 100
     },
     {
-      field: ProductKeys.unitPrice,
-      headerName: "Preço (€)",
+      field: CustomerKeys.contact,
+      headerName: "Contacto",
       width: 100
+    },
+    {
+      field: CustomerKeys.fullAddress,
+      headerName: "Morada",
+      flex: 1,
+      minWidth: 150
     },
     {
       field: "actions",
@@ -41,7 +46,7 @@ export default function productColumns(
       sortable: false,
       filterable: false,
       disableExport: true,
-      renderCell: (params: GridRenderCellParams<IProduct>) => (
+      renderCell: (params: GridRenderCellParams<ICustomer>) => (
         <>
           <GridActionsCellItem
             icon={<EditIcon />}
