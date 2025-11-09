@@ -5,6 +5,7 @@ import PageContainer from "../../../components/PageContainer";
 import AddIcon from "@mui/icons-material/Add";
 import { IOrderSchema, orderSchema } from "../services/OrderSchema";
 import OrderForm from "./form/OrderForm";
+import { OrderStatus } from "../models/Order";
 
 export default function CreateOrder() {
   const methods = useForm<IOrderSchema>({
@@ -14,32 +15,33 @@ export default function CreateOrder() {
     reValidateMode: "onChange",
     shouldFocusError: true,
     defaultValues: {
-      clientId: 0,
-      products: [],
-      state: "pendente",
-      createdAt: new Date()
+      customerId: 0,
+      productsOrders: [],
+      status: OrderStatus.Open,
+      totalQuantity: 0,
+      totalPrice: 0
     }
   });
 
-  const { reset, handleSubmit } = methods;
+  const { handleSubmit, reset } = methods;
 
-  const handleSumbitEdit = async (Product: IOrderSchema) => {
-    console.log(Product);
+  const handleSubmitEdit = async (order: IOrderSchema) => {
+    console.log("Nova encomenda:", order);
   };
 
   return (
     <PageContainer
-      title="Novo Produto"
+      title="Nova Encomenda"
       breadcrumbs={[
-        { title: "Produtos", path: "/Products" },
-        { title: "Novo" }
+        { title: "Encomendas", path: "/orders" },
+        { title: "Nova" }
       ]}
       actions={
         <Button
           type="submit"
           variant="contained"
-          onClick={handleSubmit(handleSumbitEdit)}
           startIcon={<AddIcon />}
+          onClick={handleSubmit(handleSubmitEdit)}
         >
           Criar
         </Button>

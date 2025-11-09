@@ -1,9 +1,9 @@
 export interface IProduct {
-  id: number;
+  id?: number;
   reference: string;
-  description?: string;
+  description: string | null;
   unitPrice: number;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export enum ProductKeys {

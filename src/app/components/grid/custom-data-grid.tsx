@@ -1,4 +1,9 @@
-import { DataGrid, gridClasses, GridColDef } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  gridClasses,
+  GridColDef,
+  GridEventListener
+} from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { ptPTDataGrid } from "./translation-grid";
 
@@ -7,13 +12,15 @@ interface ITable {
   loading: boolean;
   columns: GridColDef[];
   setIdsToDelete?: React.Dispatch<React.SetStateAction<number[]>>;
+  handleRowClick?: GridEventListener<"rowClick">;
 }
 
 export default function CustomDataGrid({
   rows,
   loading,
   columns,
-  setIdsToDelete
+  setIdsToDelete,
+  handleRowClick
 }: ITable) {
   return (
     <Box sx={{ flex: 1, width: "100%" }}>
@@ -68,6 +75,7 @@ export default function CustomDataGrid({
           }
         }}
         disableColumnFilter
+        onRowClick={handleRowClick && handleRowClick}
       />
     </Box>
   );

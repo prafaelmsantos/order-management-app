@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
-import { IClientSchema } from "../../services/ClientSchema";
+import { IClientSchema } from "../../services/CustomerSchema";
 
 export default function ClientForm() {
   const {

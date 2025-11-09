@@ -13,21 +13,22 @@ import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/custom-data-grid";
 import columns from "./components/grid/ProductColumns";
 import { IProduct } from "./models/Product";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getProducts } from "./services/ProductService";
+import { GridEventListener } from "@mui/x-data-grid";
 
 export default function ProductsPage() {
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(true);
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
-  const handleCreateClick = React.useCallback(() => {
+  const handleCreateClick = useCallback(() => {
     navigate("/products/new");
   }, [navigate]);
 
   const handleRowEdit = (id: number) => {
-    navigate(`/clients/${id}/edit`);
+    navigate(`/products/${id}/edit`);
   };
 
   const handleRowDelete = async (employee: IProduct) => {
@@ -74,6 +75,38 @@ export default function ProductsPage() {
       });
   }, []);
 
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    getProducts()
+      .then((data) => setProducts(data))
+      .catch((e) => {
+        notifications.show("O carregamento de produtos falhou.", {
+          severity: "error",
+          autoHideDuration: 5000
+        });
+        console.error(e);
+      });
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    if (!isLoading) {
+      loadData();
+    }
+  }, [isLoading, loadData]);
+
+  const handleRowClick = useCallback<GridEventListener<"rowClick">>(
+    ({ row }) => {
+      navigate(`/products/${row.id}`);
+    },
+    [navigate]
+  );
+
   return (
     <PageContainer
       title={"Produtos"}
@@ -82,7 +115,11 @@ export default function ProductsPage() {
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Reload data" placement="right" enterDelay={1000}>
             <div>
-              <IconButton size="small" aria-label="refresh">
+              <IconButton
+                size="small"
+                aria-label="refresh"
+                onClick={handleRefresh}
+              >
                 <RefreshIcon />
               </IconButton>
             </div>
@@ -101,7 +138,8 @@ export default function ProductsPage() {
         <CustomDataGrid
           columns={columns(handleRowEdit, handleRowDelete)}
           rows={products}
-          loading={false}
+          loading={isLoading}
+          handleRowClick={handleRowClick}
         />
       </Box>
     </PageContainer>

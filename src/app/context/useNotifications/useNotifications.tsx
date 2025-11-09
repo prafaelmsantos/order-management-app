@@ -1,5 +1,5 @@
-import * as React from 'react';
-import NotificationsContext from './NotificationsContext';
+import * as React from "react";
+import NotificationsContext from "./NotificationsContext";
 
 export interface ShowNotificationOptions {
   /**
@@ -10,19 +10,11 @@ export interface ShowNotificationOptions {
    * The severity of the notification. When provided, the snackbar will show an alert with the
    * specified severity.
    */
-  severity?: 'info' | 'warning' | 'error' | 'success';
+  severity?: "info" | "warning" | "error" | "success";
   /**
    * The duration in milliseconds after which the notification will automatically close.
    */
   autoHideDuration?: number;
-  /**
-   * The text to display on the action button.
-   */
-  actionText?: React.ReactNode;
-  /**
-   * The callback to call when the action button is clicked.
-   */
-  onAction?: () => void;
 }
 
 export interface ShowNotification {
@@ -54,7 +46,7 @@ interface UseNotifications {
 export default function useNotifications(): UseNotifications {
   const notificationsContext = React.useContext(NotificationsContext);
   if (!notificationsContext) {
-    throw new Error('Notifications context was used without a provider.');
+    throw new Error("Notifications context was used without a provider.");
   }
   return notificationsContext;
 }

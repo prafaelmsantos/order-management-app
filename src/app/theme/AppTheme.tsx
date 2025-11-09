@@ -33,9 +33,9 @@ export default function AppTheme(props: AppThemeProps) {
           shadows,
           shape,
           components: {
-            ...inputsCustomizations,
+            //...inputsCustomizations,
             ...dataDisplayCustomizations,
-            ...feedbackCustomizations,
+            //...feedbackCustomizations,
             ...navigationCustomizations,
             ...surfacesCustomizations,
             ...themeComponents

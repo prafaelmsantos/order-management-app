@@ -11,7 +11,9 @@ import { useDialogs } from "../../context/useDialogs/useDialogs";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/custom-data-grid";
+import { useEffect, useState } from "react";
 import { ICustomer } from "./models/Customer";
+import { getCustomers } from "./services/CustomerService";
 import columns from "./components/grid/CustomerColumns";
 
 export default function CustomersPage() {
@@ -28,9 +30,9 @@ export default function CustomersPage() {
     navigate(`/customers/${id}/edit`);
   };
 
-  const handleRowDelete = async (customer: ICustomer) => {
+  const handleRowDelete = async (employee: ICustomer) => {
     const confirmed = await dialogs.confirm(
-      `Do you wish to delete ${customer.fullName}?`,
+      `Do you wish to delete ${employee.fullName}?`,
       {
         title: `Delete employee?`,
         severity: "error",
@@ -41,8 +43,6 @@ export default function CustomersPage() {
 
     if (confirmed) {
       try {
-        //await deleteEmployee(Number(employee.id));
-
         notifications.show("Employee deleted successfully.", {
           severity: "success",
           autoHideDuration: 3000
@@ -61,6 +61,18 @@ export default function CustomersPage() {
       }
     }
   };
+
+  const [customers, setCustomers] = useState<ICustomer[]>([]);
+
+  useEffect(() => {
+    getCustomers()
+      .then((data) => {
+        setCustomers(data);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  }, []);
 
   return (
     <PageContainer
@@ -88,7 +100,7 @@ export default function CustomersPage() {
       <Box sx={{ flex: 1, width: "100%" }}>
         <CustomDataGrid
           columns={columns(handleRowEdit, handleRowDelete)}
-          rows={mockClients}
+          rows={customers}
           loading={false}
         />
       </Box>

@@ -13,6 +13,7 @@ import NotificationsProvider from "./context/useNotifications/NotificationsProvi
 import DialogsProvider from "./context/useDialogs/DialogsProvider";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppRouter from "./routes/AppRouter";
+import { LoadingProvider } from "./context/useLoading/LoadingProvider";
 
 const themeComponents = {
   ...dataGridCustomizations
@@ -24,7 +25,9 @@ function App() {
       <CssBaseline enableColorScheme />
       <NotificationsProvider>
         <DialogsProvider>
-          <AppRouter />
+          <LoadingProvider>
+            <AppRouter />
+          </LoadingProvider>
         </DialogsProvider>
       </NotificationsProvider>
     </AppTheme>

@@ -1,128 +1,103 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { TextField, Typography } from "@mui/material";
+import {
+  TextField,
+  Typography,
+  Paper,
+  Divider,
+  InputAdornment
+} from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import { IProductSchema } from "../../services/ProductSchema";
 
-export default function ProductForm() {
+interface IProductFormProps {
+  disabled?: boolean;
+}
+
+export default function ProductForm({ disabled }: IProductFormProps) {
   const {
     control,
     formState: { errors }
   } = useFormContext<IProductSchema>();
 
   return (
-    <Grid container spacing={2}>
-      {/* Referência */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Referência
-        </Typography>
-        <Controller
-          name="reference"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Ex: 316"
-              fullWidth
-              variant="outlined"
-              error={!!errors.reference}
-              helperText={errors.reference?.message}
-            />
-          )}
-        />
-      </Grid>
+    <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Detalhes do Produto
+      </Typography>
+      <Divider sx={{ mb: 5 }} />
 
-      {/* Descrição */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Descrição
-        </Typography>
-        <Controller
-          name="description"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Ex: Camisola"
-              fullWidth
-              variant="outlined"
-              error={!!errors.description}
-              helperText={errors.description?.message}
-            />
-          )}
-        />
-      </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
+          <Controller
+            name="reference"
+            control={control}
+            disabled={disabled}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Referência"
+                fullWidth
+                variant="outlined"
+                error={!!errors.reference}
+                helperText={errors.reference?.message}
+              />
+            )}
+          />
+        </Grid>
 
-      {/* Quantidade */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Quantidade
-        </Typography>
-        <Controller
-          name="quantity"
-          control={control}
-          defaultValue={0}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              type="number"
-              placeholder="Ex: 10"
-              fullWidth
-              variant="outlined"
-              error={!!errors.quantity}
-              helperText={errors.quantity?.message}
-            />
-          )}
-        />
-      </Grid>
+        <Grid item xs={12} sm={6}>
+          <Controller
+            name="unitPrice"
+            control={control}
+            disabled={disabled}
+            defaultValue={0}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Preço"
+                type="number"
+                fullWidth
+                variant="outlined"
+                error={!!errors.unitPrice}
+                helperText={errors.unitPrice?.message}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">€</InputAdornment>
+                    ),
+                    inputProps: { step: 1, min: 0 }
+                  }
+                }}
+              />
+            )}
+          />
+        </Grid>
 
-      {/* Cor */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Cor
-        </Typography>
-        <Controller
-          name="color"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Ex: Azul"
-              fullWidth
-              variant="outlined"
-              error={!!errors.color}
-              helperText={errors.color?.message}
-            />
-          )}
-        />
+        <Grid item xs={12}>
+          <Controller
+            name="description"
+            control={control}
+            disabled={disabled}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Descrição"
+                fullWidth
+                multiline
+                minRows={8}
+                variant="outlined"
+                error={!!errors.description}
+                helperText={errors.description?.message}
+              />
+            )}
+          />
+        </Grid>
       </Grid>
-
-      {/* Preço */}
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Preço (€)
-        </Typography>
-        <Controller
-          name="price"
-          control={control}
-          defaultValue={0}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              type="number"
-              placeholder="Ex: 10.50"
-              fullWidth
-              variant="outlined"
-              error={!!errors.price}
-              helperText={errors.price?.message}
-              inputProps={{ step: "0.01", min: "0" }}
-            />
-          )}
-        />
-      </Grid>
-    </Grid>
+    </Paper>
   );
 }
