@@ -17,12 +17,14 @@ import { IMode } from "../../../models/Mode";
 import useNotifications from "../../../context/useNotifications/useNotifications";
 import { useLoading } from "../../../context/useLoading/useLoading";
 import { useDialogs } from "../../../context/useDialogs/useDialogs";
+import { useError } from "../../../context/useError/useError";
 
 export default function ProductPage() {
   const baseUrl: string = "/products";
 
   const notifications = useNotifications();
   const { startLoading, stopLoading } = useLoading();
+  const { showError } = useError();
   const dialogs = useDialogs();
 
   const methods = useForm<IProductSchema>({
@@ -55,17 +57,12 @@ export default function ProductPage() {
         .then((data) => {
           setProduct(data);
           stopLoading();
-          dialogs.confirm(`Do you wish to delete ${"employee.name"}?`, {
-            title: `Delete employee?`,
-            severity: "error",
-            okText: "Fechar"
-            //cancelText: "Fechar"
-          });
         })
-        .catch((e) => {
+        .catch((e: Error) => {
           console.error(e);
           void handleClose();
           stopLoading();
+          showError(e.message);
         });
     } else if (!!match) {
       setMode(IMode.ADD);
@@ -100,10 +97,7 @@ export default function ProductPage() {
       .catch((e: Error) => {
         console.error(e);
         stopLoading();
-        notifications.show("Erro interno do servidor!", {
-          severity: "error",
-          autoHideDuration: 5000
-        });
+        showError(e.message);
       });
   };
 
@@ -121,10 +115,7 @@ export default function ProductPage() {
       .catch((e: Error) => {
         console.error(e);
         stopLoading();
-        notifications.show("Erro interno do servidor!", {
-          severity: "error",
-          autoHideDuration: 5000
-        });
+        showError(e.message);
       });
   };
 

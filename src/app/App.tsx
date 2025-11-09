@@ -14,6 +14,7 @@ import DialogsProvider from "./context/useDialogs/DialogsProvider";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppRouter from "./routes/AppRouter";
 import { LoadingProvider } from "./context/useLoading/LoadingProvider";
+import { ErrorProvider } from "./context/useError/ErrorProvider";
 
 const themeComponents = {
   ...dataGridCustomizations
@@ -26,7 +27,9 @@ function App() {
       <NotificationsProvider>
         <DialogsProvider>
           <LoadingProvider>
-            <AppRouter />
+            <ErrorProvider>
+              <AppRouter />
+            </ErrorProvider>
           </LoadingProvider>
         </DialogsProvider>
       </NotificationsProvider>
