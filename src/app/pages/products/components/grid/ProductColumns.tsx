@@ -1,7 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
-import { IProduct, ProductKeys } from "../../models/Product";
+import { IProductTable, ProductKeys } from "../../models/Product";
 
-export default function ProductColumns(): GridColDef<IProduct>[] {
+export default function ProductColumns(): GridColDef<IProductTable>[] {
   return [
     {
       field: ProductKeys.id,
@@ -18,12 +18,19 @@ export default function ProductColumns(): GridColDef<IProduct>[] {
       field: ProductKeys.description,
       headerName: "Descrição",
       flex: 1,
-      minWidth: 150
+      minWidth: 200
     },
     {
       field: ProductKeys.unitPrice,
       headerName: "Preço (€)",
-      width: 100
+      flex: 1,
+      minWidth: 70
+    },
+    {
+      field: ProductKeys.totalOrders,
+      headerName: "Nº Encomendas",
+      flex: 1,
+      minWidth: 70
     }
   ];
 }

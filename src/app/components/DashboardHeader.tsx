@@ -98,7 +98,7 @@ export default function DashboardHeader({
                 {logo ? <LogoContainer>{logo}</LogoContainer> : null}
                 {title ? (
                   <Typography
-                    variant="h6"
+                    variant="h3"
                     sx={{
                       color: (theme.vars ?? theme).palette.primary.main,
                       fontWeight: "700",

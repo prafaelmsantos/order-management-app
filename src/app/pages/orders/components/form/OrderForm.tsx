@@ -20,6 +20,7 @@ import { IOrderSchema, IProductOrderSchema } from "../../services/OrderSchema";
 import { OrderStatus, OrderStatusLabel } from "../../models/Order";
 import { useCallback, useEffect, useState } from "react";
 import { useLoading } from "../../../../context/useLoading/useLoading";
+import AddIcon from "@mui/icons-material/Add";
 import {
   getCustomer,
   getCustomers
@@ -260,13 +261,15 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
             <CardHeader
               title="Produtos"
               action={
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleAddProduct}
-                >
-                  Adicionar Produto
-                </Button>
+                !disabled && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handleAddProduct}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                )
               }
             />
             <CardContent>

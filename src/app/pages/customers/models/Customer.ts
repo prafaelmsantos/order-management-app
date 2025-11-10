@@ -14,6 +14,7 @@ export interface ICustomerTable {
   taxIdentificationNumber: string;
   contact: string;
   fullAddress?: string | null;
+  totalOrders: number;
 }
 
 export enum CustomerKeys {
@@ -21,5 +22,6 @@ export enum CustomerKeys {
   fullName = "fullName",
   taxIdentificationNumber = "taxIdentificationNumber",
   contact = "contact",
-  fullAddress = "fullAddress"
+  fullAddress = "fullAddress",
+  totalOrders = "totalOrders"
 }

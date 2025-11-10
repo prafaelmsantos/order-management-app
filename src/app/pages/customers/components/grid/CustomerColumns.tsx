@@ -12,23 +12,31 @@ export default function CustomerColumns(): GridColDef<ICustomerTable>[] {
       field: CustomerKeys.fullName,
       headerName: "Nome",
       flex: 1,
-      minWidth: 100
+      minWidth: 200
     },
     {
       field: CustomerKeys.taxIdentificationNumber,
       headerName: "NIF",
-      width: 100
+      flex: 1,
+      width: 120
     },
     {
       field: CustomerKeys.contact,
       headerName: "Contacto",
-      width: 100
+      flex: 1,
+      width: 120
     },
     {
       field: CustomerKeys.fullAddress,
       headerName: "Morada",
       flex: 1,
-      minWidth: 150
+      minWidth: 250
+    },
+    {
+      field: CustomerKeys.totalOrders,
+      headerName: "Nº Encomendas",
+      flex: 1,
+      minWidth: 100
     }
   ];
 }

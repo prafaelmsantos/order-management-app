@@ -136,6 +136,7 @@ export default function OrderPage() {
 
   const handleRollback = () => {
     navigate(`/orders/${orderId}`);
+    void loadData();
   };
 
   const breadcrumbs: Breadcrumb[] = [

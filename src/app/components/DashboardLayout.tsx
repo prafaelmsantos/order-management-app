@@ -58,8 +58,8 @@ export default function DashboardLayout() {
       }}
     >
       <DashboardHeader
-        logo={<SitemarkIcon />}
-        title=""
+        //logo={<SitemarkIcon />}
+        title="Raith Têxteis"
         menuOpen={isNavigationExpanded}
         onToggleMenu={handleToggleHeaderMenu}
       />

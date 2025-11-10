@@ -6,10 +6,20 @@ export interface IProduct {
   createdAt?: Date | null;
 }
 
+export interface IProductTable {
+  id?: number;
+  reference: string;
+  description: string | null;
+  unitPrice: number;
+  totalOrders: number;
+  createdDate?: Date | null;
+}
+
 export enum ProductKeys {
   id = "id",
   reference = "reference",
   description = "description",
   unitPrice = "unitPrice",
-  createdAt = "createdAt"
+  createdDate = "createdDate",
+  totalOrders = "totalOrders"
 }
