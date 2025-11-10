@@ -1,5 +1,3 @@
-import { ICustomer } from "../../customers/models/Customer";
-
 export enum OrderStatus {
   Open = 0,
   Pending,
@@ -25,7 +23,7 @@ export const OrderStatusColor: Record<OrderStatus, string> = {
 };
 
 export interface IProductOrder {
-  orderId: number;
+  orderId?: number;
   productId: number;
   unitPrice: number;
   color?: string;

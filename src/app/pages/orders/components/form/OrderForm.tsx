@@ -19,7 +19,7 @@ import {
 import Grid from "@mui/material/GridLegacy";
 import { IOrderSchema, IProductOrderSchema } from "../../services/OrderSchema";
 import { OrderStatus, OrderStatusLabel } from "../../models/Order";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoading } from "../../../../context/useLoading/useLoading";
 import {
   getCustomer,
@@ -32,9 +32,69 @@ import { IProduct } from "../../../products/models/Product";
 import { getProducts } from "../../../products/services/ProductService";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
+import ExportPDFButton from "../../../clients/components/ExportPDFButton";
 
 interface IOrderFormProps {
   disabled?: boolean;
+}
+
+export function mapProductsForPDF(
+  fields: IProductOrderSchema[],
+  productsList: IProduct[],
+  watch: any
+) {
+  return fields.map((fieldItem, idx) => {
+    const getValue = (key: string) => {
+      const value = watch(`productsOrders.${idx}.${key}`) || 0;
+      return value === 0 ? "" : value; // se 0, retorna string vazia
+    };
+
+    const totalQuantity =
+      (watch(`productsOrders.${idx}.oneMonth`) || 0) +
+      (watch(`productsOrders.${idx}.threeMonths`) || 0) +
+      (watch(`productsOrders.${idx}.sixMonths`) || 0) +
+      (watch(`productsOrders.${idx}.twelveMonths`) || 0) +
+      (watch(`productsOrders.${idx}.eighteenMonths`) || 0) +
+      (watch(`productsOrders.${idx}.twentyFourMonths`) || 0) +
+      (watch(`productsOrders.${idx}.thirtySixMonths`) || 0) +
+      (watch(`productsOrders.${idx}.oneYear`) || 0) +
+      (watch(`productsOrders.${idx}.twoYears`) || 0) +
+      (watch(`productsOrders.${idx}.threeYears`) || 0) +
+      (watch(`productsOrders.${idx}.fourYears`) || 0) +
+      (watch(`productsOrders.${idx}.sixYears`) || 0) +
+      (watch(`productsOrders.${idx}.eightYears`) || 0) +
+      (watch(`productsOrders.${idx}.tenYears`) || 0) +
+      (watch(`productsOrders.${idx}.twelveYears`) || 0);
+
+    const unitPrice = fieldItem.unitPrice;
+    const totalPrice = unitPrice * totalQuantity;
+
+    return {
+      reference:
+        productsList.find((p) => p.id === fieldItem.productId)?.reference ?? "",
+      color: fieldItem.color,
+      unitPrice,
+      totalQuantity,
+      totalPrice,
+      quantities: {
+        "1 Mês": getValue("oneMonth"),
+        "3 Meses": getValue("threeMonths"),
+        "6 Meses": getValue("sixMonths"),
+        "12 Meses": getValue("twelveMonths"),
+        "18 Meses": getValue("eighteenMonths"),
+        "24 Meses": getValue("twentyFourMonths"),
+        "36 Meses": getValue("thirtySixMonths"),
+        "1 Ano": getValue("oneYear"),
+        "2 Anos": getValue("twoYears"),
+        "3 Anos": getValue("threeYears"),
+        "4 Anos": getValue("fourYears"),
+        "6 Anos": getValue("sixYears"),
+        "8 Anos": getValue("eightYears"),
+        "10 Anos": getValue("tenYears"),
+        "12 Anos": getValue("twelveYears")
+      }
+    };
+  });
 }
 
 export default function OrderForm({ disabled }: IOrderFormProps) {
@@ -46,6 +106,8 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
     watch,
     formState: { errors }
   } = useFormContext<IOrderSchema>();
+
+  console.log(errors);
 
   const [customers, setCustomers] = useState<ICustomerTable[]>([]);
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -144,6 +206,21 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
       <Typography variant="h6" gutterBottom>
         Detalhes da Encomenda
       </Typography>
+      <ExportPDFButton
+        logoUrl="/logo.png"
+        title="Relatório de Encomenda"
+        customer={
+          customer && {
+            fullName: customer.fullName,
+            taxIdentificationNumber: customer.taxIdentificationNumber,
+            contact: customer.contact,
+            address: customer.address,
+            city: customer.city,
+            postalCode: customer.postalCode
+          }
+        }
+        products={mapProductsForPDF(fields, products, watch)}
+      />
       <Divider sx={{ mb: 5 }} />
       <Grid container spacing={2}>
         <Grid item xs={12} sm={8}>

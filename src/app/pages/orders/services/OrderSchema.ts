@@ -12,7 +12,7 @@ export const OrderStatusEnum = z.enum({
 
 export const productOrderSchema = z.object({
   id: z.number().optional(),
-  orderId: z.number().min(1, "Campo obrigatório."),
+  orderId: z.number().optional(),
   productId: z.number().min(1, "Campo obrigatório."),
   unitPrice: z.number().min(0, "Campo inválido."),
   color: z.string().optional(),
