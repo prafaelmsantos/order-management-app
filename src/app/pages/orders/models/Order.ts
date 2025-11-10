@@ -30,6 +30,7 @@ export interface IProductOrder {
   unitPrice: number;
   color?: string;
 
+  zeroMonths: number;
   oneMonth: number;
   threeMonths: number;
   sixMonths: number;
@@ -56,6 +57,8 @@ export interface IOrder {
   customerId: number;
   customer?: ICustomer;
   status: OrderStatus;
+  paymentMethod: string | null;
+  observations: string | null;
   totalQuantity: number;
   totalPrice: number;
   productsOrders: IProductOrder[];

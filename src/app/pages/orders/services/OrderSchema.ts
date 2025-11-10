@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { OrderStatus } from "../models/Order";
+import { customerSchema } from "../../customers/services/CustomerSchema";
 
 // 🧭 Enum do estado da encomenda (mesmo do backend)
 export const OrderStatusEnum = z.enum({
@@ -17,6 +18,7 @@ export const productOrderSchema = z.object({
   unitPrice: z.number().min(0, "Campo inválido."),
   color: z.string().optional(),
 
+  zeroMonths: z.number().min(0, "Campo inválido."),
   oneMonth: z.number().min(0, "Campo inválido."),
   threeMonths: z.number().min(0, "Campo inválido."),
   sixMonths: z.number().min(0, "Campo inválido."),
@@ -41,7 +43,10 @@ export const productOrderSchema = z.object({
 export const orderSchema = z.object({
   id: z.number().optional(),
   customerId: z.number().min(1, "Campo obrigatório."),
-  status: z.number().min(1, "Campo obrigatório."),
+  customer: customerSchema.optional(),
+  status: z.number().min(-1, "Campo obrigatório."),
+  paymentMethod: z.string().nullable(),
+  observations: z.string().nullable(),
   totalQuantity: z.number().min(0, "Campo inválido."),
   totalPrice: z.number().min(0, "Campo inválido."),
   productsOrders: z

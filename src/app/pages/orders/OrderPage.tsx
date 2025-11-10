@@ -16,7 +16,7 @@ import { IOrderSchema, orderSchema } from "./services/OrderSchema";
 import { IOrder, OrderStatus } from "./models/Order";
 import { createOrder, getOrder, updateOrder } from "./services/OrderService";
 import OrderForm from "./components/form/OrderForm";
-import ExportPDFButton from "../clients/components/ExportPDFButton";
+import ExportPDFButton from "../customers/components/ExportPDFButton";
 
 export default function OrderPage() {
   const baseUrl: string = "/orders";
@@ -41,6 +41,8 @@ export default function OrderPage() {
     id: 0,
     customerId: 0,
     status: OrderStatus.Open,
+    paymentMethod: null,
+    observations: null,
     totalQuantity: 0,
     totalPrice: 0,
     productsOrders: []
@@ -177,11 +179,7 @@ export default function OrderPage() {
             </Button>
           )}
           {mode === IMode.PREVIEW && (
-            <ExportPDFButton
-              logoUrl="/logo.png"
-              title="Nota de Encomenda"
-              order={order}
-            />
+            <ExportPDFButton title="Nota de Encomenda" order={order} />
           )}
 
           <Button

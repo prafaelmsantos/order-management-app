@@ -1,4 +1,3 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -12,7 +11,7 @@ import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/custom-data-grid";
 import { useCallback, useEffect, useState } from "react";
 import { ICustomerTable } from "./models/Customer";
-import { getCustomers } from "./services/CustomerService";
+import { getCustomersTable } from "./services/CustomerService";
 import CustomerColumns from "./components/grid/CustomerColumns";
 import { GridEventListener } from "@mui/x-data-grid";
 import { useLoading } from "../../context/useLoading/useLoading";
@@ -32,7 +31,7 @@ export default function CustomersPage() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     startLoading();
-    getCustomers()
+    getCustomersTable()
       .then((data) => setCustomers(data))
       .catch((e) => {
         notifications.show("O carregamento de clientes falhou.", {

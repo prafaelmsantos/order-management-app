@@ -6,35 +6,14 @@ import { Button } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 
 interface ExportPDFButtonProps {
-  logoUrl: string;
   title: string;
   order: IOrder;
 }
 
-const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
-  logoUrl,
-  title,
-  order
-}) => {
+const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({ title, order }) => {
   const handleExport = async () => {
-    const pdf = new jsPDF("p", "mm", "a4"); // orientação landscape
+    const pdf = new jsPDF("p", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
-
-    // --- Logo ---
-    if (logoUrl) {
-      try {
-        const res = await fetch(logoUrl);
-        const blob = await res.blob();
-        const imgData = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(blob);
-        });
-        pdf.addImage(imgData, "PNG", 10, 10, 25, 25);
-      } catch {
-        console.warn("Não foi possível carregar o logo");
-      }
-    }
 
     // --- Título ---
     pdf.setFontSize(18);
@@ -119,12 +98,6 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
       p.totalPrice.toFixed(2)
     ]);
 
-    // --- Largura dinâmica das colunas ---
-    const fixedCols = 7; // ref, cor, preço
-    const totalCols = head[0].length;
-    const dynamicWidth =
-      (pageWidth - 20 - 25 - 25 - 25) / (totalCols - fixedCols); // margem + fixos
-
     const columnStyles: Record<number, any> = {
       0: { cellWidth: 15, halign: "center" }, // Referência
       1: { cellWidth: 15, halign: "center" }, // Cor
@@ -182,7 +155,7 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
       onClick={handleExport}
       startIcon={<DownloadIcon />}
     >
-      Exportar PDF
+      Exportar
     </Button>
   );
 };
