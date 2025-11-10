@@ -1,3 +1,5 @@
+import { ICustomer } from "../../customers/models/Customer";
+
 export enum OrderStatus {
   Open = 0,
   Pending,
@@ -52,6 +54,7 @@ export interface IProductOrder {
 export interface IOrder {
   id?: number;
   customerId: number;
+  customer?: ICustomer;
   status: OrderStatus;
   totalQuantity: number;
   totalPrice: number;

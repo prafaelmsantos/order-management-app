@@ -1,147 +1,189 @@
 import React from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-interface ProductRow {
-  reference: string;
-  color?: string;
-  unitPrice: number;
-  totalQuantity: number;
-  totalPrice: number;
-  quantities: Record<string, number | string>; // 0 vira ""
-}
-
-interface CustomerInfo {
-  fullName: string;
-  taxIdentificationNumber: string;
-  contact: string;
-  address: string;
-  city: string;
-  postalCode: string;
-}
+import { IOrder } from "../../orders/models/Order";
+import { Button } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
 
 interface ExportPDFButtonProps {
   logoUrl: string;
   title: string;
-  customer?: CustomerInfo;
-  products: ProductRow[];
+  order: IOrder;
 }
 
 const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
   logoUrl,
   title,
-  customer,
-  products
+  order
 }) => {
   const handleExport = async () => {
-    const pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF("p", "mm", "a4"); // orientação landscape
     const pageWidth = pdf.internal.pageSize.getWidth();
 
-    // Adiciona logo
-    /* if (logoUrl) {
-      const img = new Image();
-      img.src = logoUrl;
-      await new Promise((resolve) => {
-        img.onload = () => {
-          const ratio = img.width / img.height;
-          const imgWidth = 30; // largura em mm
-          const imgHeight = imgWidth / ratio;
-          pdf.addImage(img, "PNG", 10, 10, imgWidth, imgHeight);
-          resolve(true);
-        };
-      });
-    } */
+    // --- Logo ---
+    if (logoUrl) {
+      try {
+        const res = await fetch(logoUrl);
+        const blob = await res.blob();
+        const imgData = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+        pdf.addImage(imgData, "PNG", 10, 10, 25, 25);
+      } catch {
+        console.warn("Não foi possível carregar o logo");
+      }
+    }
 
-    // Título
+    // --- Título ---
     pdf.setFontSize(18);
-    pdf.text(title, pageWidth / 2, 25, { align: "center" });
+    pdf.text(title, pageWidth / 2, 20, { align: "center" });
 
-    let currentY = 35;
+    let currentY = 40;
 
-    // Cliente
-    if (customer) {
-      pdf.setFontSize(14);
-      pdf.text("Cliente", 10, currentY);
+    // --- Cliente ---
+    if (order.customer) {
+      pdf.setFontSize(12);
+      pdf.text("Informações do Cliente", 10, currentY);
       currentY += 6;
-
-      pdf.setFontSize(10);
-      pdf.text(`Nome: ${customer.fullName}`, 10, currentY);
-      pdf.text(`NIF: ${customer.taxIdentificationNumber}`, 80, currentY);
-      currentY += 6;
-      pdf.text(`Contacto: ${customer.contact}`, 10, currentY);
-      pdf.text(`Morada: ${customer.address}`, 80, currentY);
-      currentY += 6;
-      pdf.text(`Código Postal: ${customer.postalCode}`, 10, currentY);
-      pdf.text(`Cidade: ${customer.city}`, 80, currentY);
+      pdf.setFontSize(9);
+      pdf.text(`Nome: ${order.customer.fullName}`, 10, currentY);
+      pdf.text(`NIF: ${order.customer.taxIdentificationNumber}`, 100, currentY);
+      currentY += 5;
+      pdf.text(`Contacto: ${order.customer.contact}`, 10, currentY);
+      pdf.text(`Cidade: ${order.customer.city}`, 100, currentY);
+      currentY += 5;
+      pdf.text(`Morada: ${order.customer.address}`, 10, currentY);
+      currentY += 5;
+      pdf.text(`Código Postal: ${order.customer.postalCode}`, 10, currentY);
       currentY += 10;
     }
 
-    // Preparar colunas
-    const quantidadeKeys =
-      products.length > 0 ? Object.keys(products[0].quantities) : [];
-
-    const head = [
-      "Referência",
-      "Cor",
-      "Preço Unit.",
-      ...quantidadeKeys,
-      "Qtd. Total",
-      "Total"
+    // --- Cabeçalhos das colunas ---
+    const monthColumns = [
+      "0 M",
+      "1 M",
+      "3 M",
+      "6 M",
+      "12 M",
+      "18 M",
+      "24 M",
+      "36 M",
+      "1 A",
+      "2 A",
+      "3 A",
+      "4 A",
+      "6 A",
+      "8 A",
+      "10 A",
+      "12 A"
     ];
 
-    // Preparar linhas
-    const body = products.map((p) => [
-      p.reference,
+    const head = [
+      [
+        "Referência",
+        "Descrição",
+        "Cor",
+        ...monthColumns,
+        "Preço Unit. (€)",
+        "Qtd. Total",
+        "Total (€)"
+      ]
+    ];
+
+    // --- Corpo da tabela ---
+    const body = order.productsOrders.map((p) => [
+      p.productId.toString(),
+
+      "desc fjfjf jfjfjf xd xd1 xd2",
       p.color || "",
+      p.oneMonth || "",
+      p.oneMonth || "",
+      p.threeMonths || "",
+      p.sixMonths || "",
+      p.twelveMonths || "",
+      p.eighteenMonths || "",
+      p.twentyFourMonths || "",
+      p.thirtySixMonths || "",
+      p.oneYear || "",
+      p.twoYears || "",
+      p.threeYears || "",
+      p.fourYears || "",
+      p.sixYears || "",
+      p.eightYears || "",
+      p.tenYears || "",
+      p.twelveYears || "",
+      p.totalQuantity || "",
       p.unitPrice.toFixed(2),
-      ...quantidadeKeys.map((k) =>
-        p.quantities[k] === 0 ? "" : p.quantities[k]
-      ),
-      p.totalQuantity,
       p.totalPrice.toFixed(2)
     ]);
 
+    // --- Largura dinâmica das colunas ---
+    const fixedCols = 7; // ref, cor, preço
+    const totalCols = head[0].length;
+    const dynamicWidth =
+      (pageWidth - 20 - 25 - 25 - 25) / (totalCols - fixedCols); // margem + fixos
+
+    const columnStyles: Record<number, any> = {
+      0: { cellWidth: 15, halign: "center" }, // Referência
+      1: { cellWidth: 15, halign: "center" }, // Cor
+      2: { cellWidth: 20, halign: "center" }, // Descrição
+      3: { cellWidth: 6, halign: "center" }, // 1 Mês
+      4: { cellWidth: 6, halign: "center" }, // 3 Meses
+      5: { cellWidth: 6, halign: "center" }, // 6 Meses
+      6: { cellWidth: 6, halign: "center" }, // 12 Meses
+      7: { cellWidth: 6, halign: "center" }, // 18 Meses
+      8: { cellWidth: 6, halign: "center" }, // 24 Meses
+      9: { cellWidth: 6, halign: "center" }, // 36 Meses
+      10: { cellWidth: 6, halign: "center" }, // 1 Ano
+      11: { cellWidth: 6, halign: "center" }, // 2 Anos
+      12: { cellWidth: 6, halign: "center" }, // 3 Anos
+      13: { cellWidth: 6, halign: "center" }, // 4 Anos
+      14: { cellWidth: 6, halign: "center" }, // 6 Anos
+      15: { cellWidth: 6, halign: "center" }, // 8 Anos
+      16: { cellWidth: 6, halign: "center" }, // 10 Anos
+      17: { cellWidth: 6, halign: "center" }, // 12 Anos
+      18: { cellWidth: 10, halign: "center" }, // Qtd. Total
+      19: { cellWidth: 10, halign: "center" }, // Preço Unit.
+      20: { cellWidth: 15, halign: "center" } // Total (€)
+    };
+
+    // --- Grelha ---
     autoTable(pdf, {
-      head: [head],
-      body: body,
+      head,
+      body,
       startY: currentY,
       //theme: "grid",
-      styles: {
-        fontSize: 6, // aplica a todas as células
-        cellPadding: 1
-      },
-      headStyles: {
-        fontSize: 6 // opcional, mas garante que o cabeçalho também fique 8
-      },
+      headStyles: { fontSize: 5, fontStyle: "bold" },
+      styles: { fontSize: 6, cellPadding: 1, halign: "center" },
+      columnStyles,
       margin: { left: 10, right: 10 },
-      columnStyles: {
-        0: { cellWidth: 30 }, // Referência
-        1: { cellWidth: 20 } // Cor
-
-        // as colunas de quantidade e totais vão se ajustar automaticamente
-      },
-      didDrawPage: (data) => {
-        // opcional: rodapé
-      }
+      tableWidth: "auto"
     });
 
-    pdf.save("relatorio.pdf");
+    // --- Total final ---
+    const endY = (pdf as any).lastAutoTable.finalY + 10;
+    pdf.setFontSize(10);
+    pdf.text(
+      `Total Geral: ${
+        order.totalQuantity
+      } unidades — ${order.totalPrice.toFixed(2)} €`,
+      10,
+      endY
+    );
+
+    pdf.save(`Encomenda_${order.id || "nova"}.pdf`);
   };
 
   return (
-    <button
+    <Button
+      variant="contained"
       onClick={handleExport}
-      style={{
-        padding: "8px 16px",
-        backgroundColor: "#1976d2",
-        color: "#fff",
-        border: "none",
-        borderRadius: 4,
-        cursor: "pointer"
-      }}
+      startIcon={<DownloadIcon />}
     >
       Exportar PDF
-    </button>
+    </Button>
   );
 };
 

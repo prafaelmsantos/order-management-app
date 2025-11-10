@@ -16,6 +16,7 @@ import { IOrderSchema, orderSchema } from "./services/OrderSchema";
 import { IOrder, OrderStatus } from "./models/Order";
 import { createOrder, getOrder, updateOrder } from "./services/OrderService";
 import OrderForm from "./components/form/OrderForm";
+import ExportPDFButton from "../clients/components/ExportPDFButton";
 
 export default function OrderPage() {
   const baseUrl: string = "/orders";
@@ -159,7 +160,7 @@ export default function OrderPage() {
           ? "Criar Encomenda"
           : mode === IMode.EDIT
           ? "Editar Encomenda"
-          : order.id?.toString()
+          : "No." + order.id?.toString()
       }
       breadcrumbs={breadcrumbs}
       actions={
@@ -173,6 +174,13 @@ export default function OrderPage() {
             >
               {mode === IMode.EDIT ? "Fechar" : "Voltar a lista"}
             </Button>
+          )}
+          {mode === IMode.PREVIEW && (
+            <ExportPDFButton
+              logoUrl="/logo.png"
+              title="Nota de Encomenda"
+              order={order}
+            />
           )}
 
           <Button

@@ -4,7 +4,6 @@ import {
   AccordionDetails,
   AccordionSummary,
   Autocomplete,
-  Box,
   Button,
   Card,
   CardContent,
@@ -19,82 +18,20 @@ import {
 import Grid from "@mui/material/GridLegacy";
 import { IOrderSchema, IProductOrderSchema } from "../../services/OrderSchema";
 import { OrderStatus, OrderStatusLabel } from "../../models/Order";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLoading } from "../../../../context/useLoading/useLoading";
 import {
   getCustomer,
   getCustomers
 } from "../../../customers/services/CustomerService";
-import useNotifications from "../../../../context/useNotifications/useNotifications";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ICustomer, ICustomerTable } from "../../../customers/models/Customer";
 import { IProduct } from "../../../products/models/Product";
 import { getProducts } from "../../../products/services/ProductService";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AddIcon from "@mui/icons-material/Add";
-import ExportPDFButton from "../../../clients/components/ExportPDFButton";
 
 interface IOrderFormProps {
   disabled?: boolean;
-}
-
-export function mapProductsForPDF(
-  fields: IProductOrderSchema[],
-  productsList: IProduct[],
-  watch: any
-) {
-  return fields.map((fieldItem, idx) => {
-    const getValue = (key: string) => {
-      const value = watch(`productsOrders.${idx}.${key}`) || 0;
-      return value === 0 ? "" : value; // se 0, retorna string vazia
-    };
-
-    const totalQuantity =
-      (watch(`productsOrders.${idx}.oneMonth`) || 0) +
-      (watch(`productsOrders.${idx}.threeMonths`) || 0) +
-      (watch(`productsOrders.${idx}.sixMonths`) || 0) +
-      (watch(`productsOrders.${idx}.twelveMonths`) || 0) +
-      (watch(`productsOrders.${idx}.eighteenMonths`) || 0) +
-      (watch(`productsOrders.${idx}.twentyFourMonths`) || 0) +
-      (watch(`productsOrders.${idx}.thirtySixMonths`) || 0) +
-      (watch(`productsOrders.${idx}.oneYear`) || 0) +
-      (watch(`productsOrders.${idx}.twoYears`) || 0) +
-      (watch(`productsOrders.${idx}.threeYears`) || 0) +
-      (watch(`productsOrders.${idx}.fourYears`) || 0) +
-      (watch(`productsOrders.${idx}.sixYears`) || 0) +
-      (watch(`productsOrders.${idx}.eightYears`) || 0) +
-      (watch(`productsOrders.${idx}.tenYears`) || 0) +
-      (watch(`productsOrders.${idx}.twelveYears`) || 0);
-
-    const unitPrice = fieldItem.unitPrice;
-    const totalPrice = unitPrice * totalQuantity;
-
-    return {
-      reference:
-        productsList.find((p) => p.id === fieldItem.productId)?.reference ?? "",
-      color: fieldItem.color,
-      unitPrice,
-      totalQuantity,
-      totalPrice,
-      quantities: {
-        "1 Mês": getValue("oneMonth"),
-        "3 Meses": getValue("threeMonths"),
-        "6 Meses": getValue("sixMonths"),
-        "12 Meses": getValue("twelveMonths"),
-        "18 Meses": getValue("eighteenMonths"),
-        "24 Meses": getValue("twentyFourMonths"),
-        "36 Meses": getValue("thirtySixMonths"),
-        "1 Ano": getValue("oneYear"),
-        "2 Anos": getValue("twoYears"),
-        "3 Anos": getValue("threeYears"),
-        "4 Anos": getValue("fourYears"),
-        "6 Anos": getValue("sixYears"),
-        "8 Anos": getValue("eightYears"),
-        "10 Anos": getValue("tenYears"),
-        "12 Anos": getValue("twelveYears")
-      }
-    };
-  });
 }
 
 export default function OrderForm({ disabled }: IOrderFormProps) {
@@ -206,21 +143,7 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
       <Typography variant="h6" gutterBottom>
         Detalhes da Encomenda
       </Typography>
-      <ExportPDFButton
-        logoUrl="/logo.png"
-        title="Relatório de Encomenda"
-        customer={
-          customer && {
-            fullName: customer.fullName,
-            taxIdentificationNumber: customer.taxIdentificationNumber,
-            contact: customer.contact,
-            address: customer.address,
-            city: customer.city,
-            postalCode: customer.postalCode
-          }
-        }
-        products={mapProductsForPDF(fields, products, watch)}
-      />
+
       <Divider sx={{ mb: 5 }} />
       <Grid container spacing={2}>
         <Grid item xs={12} sm={8}>
@@ -233,6 +156,7 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                 getOptionLabel={(option) =>
                   customers.find((x) => x.id === option)?.fullName ?? ""
                 }
+                disabled={disabled}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -304,18 +228,15 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
 
         {/* Estado */}
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-            Estado
-          </Typography>
           <Controller
             name="status"
             control={control}
+            disabled={disabled}
             render={({ field }) => (
               <TextField
                 {...field}
                 select
                 fullWidth
-                disabled={disabled}
                 error={!!errors.status}
                 helperText={errors.status?.message}
               >
@@ -365,10 +286,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                   sx={{ mt: 1, mb: 2 }}
                 >
                   {/* Referência */}
-                  <Grid item xs={3}>
+                  <Grid item xs={2}>
                     <Controller
                       name={`productsOrders.${idx}.productId`}
                       control={control}
+                      disabled={disabled}
                       render={({ field: { onChange, value, ...others } }) => (
                         <Autocomplete
                           {...others}
@@ -416,7 +338,7 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                   </Grid>
 
                   {/* Preço */}
-                  <Grid item xs={3}>
+                  <Grid item xs={4.5}>
                     <TextField
                       label="Descrição."
                       size="small"
@@ -427,11 +349,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                   </Grid>
 
                   {/* Cor */}
-                  <Grid item xs={2}>
+                  <Grid item xs={1.5}>
                     <Controller
                       name={`productsOrders.${idx}.color`}
                       control={control}
-                      defaultValue={fieldItem.color}
+                      disabled={disabled}
                       render={({ field }) => (
                         <TextField
                           {...field}
@@ -465,13 +387,13 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                     <Controller
                       name={`productsOrders.${idx}.totalQuantity`}
                       control={control}
+                      disabled
                       render={({ field }) => (
                         <TextField
                           {...field}
                           label="Qtd. Total"
                           size="small"
                           fullWidth
-                          disabled
                           value={
                             (watch(`productsOrders.${idx}.oneMonth`) || 0) +
                             (watch(`productsOrders.${idx}.threeMonths`) || 0) +
@@ -530,13 +452,15 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                   {/* Remover */}
 
                   <Grid item xs={1} display="flex" justifyContent="center">
-                    <IconButton
-                      color="error"
-                      onClick={() => remove(idx)}
-                      aria-label="Remover produto"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    {!disabled && (
+                      <IconButton
+                        color="error"
+                        onClick={() => remove(idx)}
+                        aria-label="Remover produto"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                   </Grid>
 
                   {/* Quantidades agrupadas */}
@@ -548,11 +472,47 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Grid container spacing={2}>
-                        {/* 1 Mês */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        {/* 0 Meses */}
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.oneMonth`}
                             control={control}
+                            disabled={disabled}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                size="small"
+                                type="number"
+                                label="0 Meses"
+                                fullWidth
+                                onChange={(e) =>
+                                  field.onChange(
+                                    Number(e.target.value) >= 0
+                                      ? Number(e.target.value)
+                                      : 0
+                                  )
+                                }
+                                slotProps={{
+                                  input: {
+                                    inputProps: { step: 1, min: 0 }
+                                  }
+                                }}
+                                error={!!errors.productsOrders?.[idx]?.oneMonth}
+                                helperText={
+                                  errors.productsOrders?.[idx]?.oneMonth
+                                    ?.message
+                                }
+                              />
+                            )}
+                          />
+                        </Grid>
+
+                        {/* 1 Mês */}
+                        <Grid item xs={3} sm={2} md={1}>
+                          <Controller
+                            name={`productsOrders.${idx}.oneMonth`}
+                            control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -583,10 +543,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 3 Meses */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.threeMonths`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -619,10 +580,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 6 Meses */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.sixMonths`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -655,10 +617,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 12 Meses */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.twelveMonths`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -691,10 +654,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 18 Meses */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.eighteenMonths`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -727,10 +691,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 24 Meses */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.twentyFourMonths`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -764,10 +729,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 36 Meses */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.thirtySixMonths`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -799,12 +765,14 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                             )}
                           />
                         </Grid>
-
+                      </Grid>
+                      <Grid container spacing={2} sx={{ mt: 2 }}>
                         {/* 1 Ano */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.oneYear`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -834,10 +802,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 2 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.twoYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -868,10 +837,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 3 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.threeYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -904,10 +874,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 4 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.fourYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -940,10 +911,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 6 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.sixYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -974,10 +946,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 8 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.eightYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -1010,10 +983,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 10 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.tenYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
@@ -1044,10 +1018,11 @@ export default function OrderForm({ disabled }: IOrderFormProps) {
                         </Grid>
 
                         {/* 12 Anos */}
-                        <Grid item xs={3} sm={2} md={1} sx={{ mt: 2 }}>
+                        <Grid item xs={3} sm={2} md={1}>
                           <Controller
                             name={`productsOrders.${idx}.twelveYears`}
                             control={control}
+                            disabled={disabled}
                             render={({ field }) => (
                               <TextField
                                 {...field}
