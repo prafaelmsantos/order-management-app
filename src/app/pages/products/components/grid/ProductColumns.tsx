@@ -1,16 +1,7 @@
-import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRenderCellParams
-} from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { GridColDef } from "@mui/x-data-grid";
 import { IProduct, ProductKeys } from "../../models/Product";
 
-export default function productColumns(
-  handleRowEdit: (id: number) => void,
-  handleRowDelete: (product: IProduct) => void
-): GridColDef<IProduct>[] {
+export default function ProductColumns(): GridColDef<IProduct>[] {
   return [
     {
       field: ProductKeys.id,
@@ -33,28 +24,6 @@ export default function productColumns(
       field: ProductKeys.unitPrice,
       headerName: "Preço (€)",
       width: 100
-    },
-    {
-      field: "actions",
-      headerName: "Ações",
-      width: 100,
-      sortable: false,
-      filterable: false,
-      disableExport: true,
-      renderCell: (params: GridRenderCellParams<IProduct>) => (
-        <>
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Editar"
-            onClick={() => handleRowEdit(Number(params.row.id))}
-          />
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Excluir"
-            onClick={() => handleRowDelete(params.row)}
-          />
-        </>
-      )
     }
   ];
 }

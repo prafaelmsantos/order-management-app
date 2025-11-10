@@ -10,32 +10,31 @@ export const OrderStatusEnum = z.enum({
   Cancelled: 4
 });
 
-// ✅ ProductOrder Schema
 export const productOrderSchema = z.object({
   id: z.number().optional(),
   orderId: z.number().min(1, "Campo obrigatório."),
   productId: z.number().min(1, "Campo obrigatório."),
-  unitPrice: z.number().min(0, "Campo obrigatório."),
+  unitPrice: z.number().min(0, "Campo inválido."),
   color: z.string().optional(),
 
-  oneMonth: z.number().min(0, "Campo obrigatório."),
-  threeMonths: z.number().min(0, "Campo obrigatório."),
-  sixMonths: z.number().min(0, "Campo obrigatório."),
-  twelveMonths: z.number().min(0, "Campo obrigatório."),
-  eighteenMonths: z.number().min(0, "Campo obrigatório."),
-  twentyFourMonths: z.number().min(0, "Campo obrigatório."),
-  thirtySixMonths: z.number().min(0, "Campo obrigatório."),
+  oneMonth: z.number().min(0, "Campo inválido."),
+  threeMonths: z.number().min(0, "Campo inválido."),
+  sixMonths: z.number().min(0, "Campo inválido."),
+  twelveMonths: z.number().min(0, "Campo inválido."),
+  eighteenMonths: z.number().min(0, "Campo inválido."),
+  twentyFourMonths: z.number().min(0, "Campo inválido."),
+  thirtySixMonths: z.number().min(0, "Campo inválido."),
 
-  oneYear: z.number().min(0, "Campo obrigatório."),
-  twoYears: z.number().min(0, "Campo obrigatório."),
-  threeYears: z.number().min(0, "Campo obrigatório."),
-  fourYears: z.number().min(0, "Campo obrigatório."),
-  sixYears: z.number().min(0, "Campo obrigatório."),
-  eightYears: z.number().min(0, "Campo obrigatório."),
-  tenYears: z.number().min(0, "Campo obrigatório."),
-  twelveYears: z.number().min(0, "Campo obrigatório."),
+  oneYear: z.number().min(0, "Campo inválido."),
+  twoYears: z.number().min(0, "Campo inválido."),
+  threeYears: z.number().min(0, "Campo inválido."),
+  fourYears: z.number().min(0, "Campo inválido."),
+  sixYears: z.number().min(0, "Campo inválido."),
+  eightYears: z.number().min(0, "Campo inválido."),
+  tenYears: z.number().min(0, "Campo inválido."),
+  twelveYears: z.number().min(0, "Campo inválido."),
 
-  totalQuantity: z.number().min(0, "Campo obrigatório."),
+  totalQuantity: z.number().min(0, "Campo inválido."),
   totalPrice: z.number().min(0, "Campo obrigatório.")
 });
 
@@ -43,13 +42,12 @@ export const orderSchema = z.object({
   id: z.number().optional(),
   customerId: z.number().min(1, "Campo obrigatório."),
   status: z.number().min(1, "Campo obrigatório."),
-  totalQuantity: z.number().min(0, "Campo obrigatório."),
-  totalPrice: z.number().min(0, "Campo obrigatório."),
+  totalQuantity: z.number().min(0, "Campo inválido."),
+  totalPrice: z.number().min(0, "Campo inválido."),
   productsOrders: z
     .array(productOrderSchema)
     .min(1, "A encomenda deve conter pelo menos um produto.")
 });
 
-// ✅ Tipagem inferida
 export type IOrderSchema = z.infer<typeof orderSchema>;
 export type IProductOrderSchema = z.infer<typeof productOrderSchema>;

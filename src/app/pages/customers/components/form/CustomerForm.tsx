@@ -1,147 +1,146 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { TextField, Typography } from "@mui/material";
+import { Divider, Paper, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
-import { IClientSchema } from "../../services/CustomerSchema";
+import { ICustomerSchema } from "../../services/CustomerSchema";
 
-export default function ClientForm() {
+interface ICustomerFormProps {
+  disabled?: boolean;
+}
+
+export default function CustomerForm({ disabled }: ICustomerFormProps) {
   const {
     control,
     formState: { errors }
-  } = useFormContext<IClientSchema>();
+  } = useFormContext<ICustomerSchema>();
 
   return (
-    <Grid container spacing={2}>
-      {/* Nome completo */}
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Nome completo
-        </Typography>
-        <Controller
-          name="fullName"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Digite o nome completo"
-              fullWidth
-              variant="outlined"
-              error={!!errors.fullName}
-              helperText={errors.fullName?.message}
-            />
-          )}
-        />
-      </Grid>
+    <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Detalhes do Cliente
+      </Typography>
+      <Divider sx={{ mb: 5 }} />
 
-      {/* NIF */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          NIF
-        </Typography>
-        <Controller
-          name="taxIdentificationNumber"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              type="number"
-              placeholder="NIF"
-              fullWidth
-              variant="outlined"
-              error={!!errors.taxIdentificationNumber}
-              helperText={errors.taxIdentificationNumber?.message}
-            />
-          )}
-        />
-      </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={8}>
+          <Controller
+            name="fullName"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Nome Completo"
+                fullWidth
+                variant="outlined"
+                error={!!errors.fullName}
+                helperText={errors.fullName?.message}
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
 
-      {/* Contacto */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Telefone
-        </Typography>
-        <Controller
-          name="contact"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Telefone"
-              fullWidth
-              variant="outlined"
-              error={!!errors.contact}
-              helperText={errors.contact?.message}
-            />
-          )}
-        />
-      </Grid>
+        <Grid item xs={12} sm={2}>
+          <Controller
+            name="taxIdentificationNumber"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="NIF"
+                fullWidth
+                variant="outlined"
+                error={!!errors.taxIdentificationNumber}
+                helperText={errors.taxIdentificationNumber?.message}
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
 
-      {/* Morada */}
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Morada
-        </Typography>
-        <Controller
-          name="address"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Rua, número, apartamento"
-              fullWidth
-              variant="outlined"
-              error={!!errors.address}
-              helperText={errors.address?.message}
-            />
-          )}
-        />
-      </Grid>
+        <Grid item xs={12} sm={2}>
+          <Controller
+            name="contact"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Contacto"
+                fullWidth
+                variant="outlined"
+                error={!!errors.contact}
+                helperText={errors.contact?.message}
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
 
-      {/* Código postal */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Código Postal
-        </Typography>
-        <Controller
-          name="postalCode"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="1000-000"
-              fullWidth
-              variant="outlined"
-              error={!!errors.postalCode}
-              helperText={errors.postalCode?.message}
-            />
-          )}
-        />
-      </Grid>
+        <Grid item xs={12} sm={8}>
+          <Controller
+            name="address"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Morada"
+                fullWidth
+                variant="outlined"
+                error={!!errors.address}
+                helperText={errors.address?.message}
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
 
-      {/* Cidade */}
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Cidade
-        </Typography>
-        <Controller
-          name="city"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              placeholder="Lisboa"
-              fullWidth
-              variant="outlined"
-              error={!!errors.city}
-              helperText={errors.city?.message}
-            />
-          )}
-        />
+        <Grid item xs={12} sm={2}>
+          <Controller
+            name="postalCode"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Código Postal"
+                fullWidth
+                variant="outlined"
+                error={!!errors.postalCode}
+                helperText={errors.postalCode?.message}
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={2}>
+          <Controller
+            name="city"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                label="Cidade"
+                fullWidth
+                variant="outlined"
+                error={!!errors.city}
+                helperText={errors.city?.message}
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
       </Grid>
-    </Grid>
+    </Paper>
   );
 }

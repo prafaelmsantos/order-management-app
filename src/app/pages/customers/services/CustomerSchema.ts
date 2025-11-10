@@ -1,33 +1,24 @@
 import { z } from "zod";
 
 export const customerSchema = z.object({
-  fullName: z
-    .string()
-    .trim()
-    .min(3, "O nome completo deve ter pelo menos 3 caracteres.")
-    .regex(/^[A-Za-zÀ-ÿ\s']+$/, "O nome contém caracteres inválidos."),
+  id: z.number().optional(),
+  fullName: z.string().trim().min(1, "Campo obrigatório."),
 
   taxIdentificationNumber: z
     .string()
     .trim()
     .regex(/^\d{9}$/, "O NIF deve conter exatamente 9 dígitos."),
 
-  contact: z
-    .string()
-    .trim()
-    .regex(/^\d{9}$/, "O contacto deve conter exatamente 9 dígitos."),
+  contact: z.string().trim().min(1, "Campo obrigatório."),
 
-  address: z
-    .string()
-    .trim()
-    .min(3, "A morada deve ter pelo menos 3 caracteres."),
+  address: z.string().trim().trim().min(1, "Campo obrigatório."),
 
   postalCode: z
     .string()
     .trim()
     .regex(/^\d{4}-\d{3}$/, "O código postal deve estar no formato 0000-000."),
 
-  city: z.string().trim().min(2, "A cidade deve ter pelo menos 2 caracteres.")
+  city: z.string().trim().min(1, "Campo obrigatório.")
 });
 
 export type ICustomerSchema = z.infer<typeof customerSchema>;

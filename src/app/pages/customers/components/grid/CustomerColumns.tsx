@@ -1,16 +1,7 @@
-import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRenderCellParams
-} from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { CustomerKeys, ICustomer } from "../../models/Customer";
+import { GridColDef } from "@mui/x-data-grid";
+import { CustomerKeys, ICustomerTable } from "../../models/Customer";
 
-export default function columns(
-  handleRowEdit: (id: number) => void,
-  handleRowDelete: (client: ICustomer) => void
-): GridColDef<ICustomer>[] {
+export default function CustomerColumns(): GridColDef<ICustomerTable>[] {
   return [
     {
       field: CustomerKeys.id,
@@ -19,7 +10,7 @@ export default function columns(
     },
     {
       field: CustomerKeys.fullName,
-      headerName: "Nome Completo",
+      headerName: "Nome",
       flex: 1,
       minWidth: 100
     },
@@ -38,28 +29,6 @@ export default function columns(
       headerName: "Morada",
       flex: 1,
       minWidth: 150
-    },
-    {
-      field: "actions",
-      headerName: "Ações",
-      width: 100,
-      sortable: false,
-      filterable: false,
-      disableExport: true,
-      renderCell: (params: GridRenderCellParams<ICustomer>) => (
-        <>
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Editar"
-            onClick={() => handleRowEdit(Number(params.row.id))}
-          />
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Excluir"
-            onClick={() => handleRowDelete(params.row)}
-          />
-        </>
-      )
     }
   ];
 }

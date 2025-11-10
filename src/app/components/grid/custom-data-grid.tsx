@@ -72,6 +72,12 @@ export default function CustomDataGrid({
             },
           [`& .${gridClasses.row}:hover`]: {
             cursor: "pointer"
+          },
+          "& .MuiDataGrid-cellCheckbox": {
+            padding: "8px" // espaço interno
+          },
+          "& .MuiCheckbox-root": {
+            transform: "scale(1.4)" // aumenta o tamanho da checkbox
           }
         }}
         disableColumnFilter

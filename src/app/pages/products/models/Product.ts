@@ -3,7 +3,7 @@ export interface IProduct {
   reference: string;
   description: string | null;
   unitPrice: number;
-  createdAt?: Date;
+  createdAt?: Date | null;
 }
 
 export enum ProductKeys {

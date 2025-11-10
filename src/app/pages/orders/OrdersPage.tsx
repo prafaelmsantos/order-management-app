@@ -1,4 +1,3 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -7,59 +6,61 @@ import Tooltip from "@mui/material/Tooltip";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useNavigate } from "react-router";
-import { useDialogs } from "../../context/useDialogs/useDialogs";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/custom-data-grid";
-import { mockOrders } from "./Orders";
-import { IOrder } from "./models/Order";
-import orderColumns from "./components/grid/OrderColumns";
+import { useCallback, useEffect, useState } from "react";
+import { GridEventListener } from "@mui/x-data-grid";
+import { useLoading } from "../../context/useLoading/useLoading";
+import { IOrderTable } from "./models/Order";
+import { getOrders } from "./services/OrderService";
+import OrderColumns from "./components/grid/OrderColumns";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
-
-  const dialogs = useDialogs();
+  const [isLoading, setIsLoading] = useState(false);
   const notifications = useNotifications();
+  const { startLoading, stopLoading } = useLoading();
 
-  const handleCreateClick = React.useCallback(() => {
+  const handleCreateClick = useCallback(() => {
     navigate("/orders/new");
   }, [navigate]);
 
-  const handleRowEdit = (id: number) => {
-    navigate(`/orders/${id}/edit`);
-  };
+  const [orders, setOrders] = useState<IOrderTable[]>([]);
 
-  const handleRowDelete = async (employee: IOrder) => {
-    const confirmed = await dialogs.confirm(
-      `Do you wish to delete ${employee.id}?`,
-      {
-        title: `Delete employee?`,
-        severity: "error",
-        okText: "Delete",
-        cancelText: "Cancel"
-      }
-    );
-
-    if (confirmed) {
-      try {
-        notifications.show("Employee deleted successfully.", {
-          severity: "success",
-          autoHideDuration: 3000
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    startLoading();
+    getOrders()
+      .then((data) => setOrders(data))
+      .catch((e) => {
+        notifications.show("O carregamento de encomendas falhou.", {
+          severity: "error",
+          autoHideDuration: 5000
         });
-        //loadData();
-      } catch (deleteError) {
-        notifications.show(
-          `Failed to delete employee. Reason:' ${
-            (deleteError as Error).message
-          }`,
-          {
-            severity: "error",
-            autoHideDuration: 3000
-          }
-        );
-      }
+        console.error(e);
+      });
+
+    setIsLoading(false);
+    stopLoading();
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    if (!isLoading) {
+      loadData();
     }
-  };
+  }, [isLoading, loadData]);
+
+  const handleRowClick = useCallback<GridEventListener<"rowClick">>(
+    ({ row }) => {
+      navigate(`/orders/${row.id}`);
+    },
+    [navigate]
+  );
 
   return (
     <PageContainer
@@ -67,9 +68,13 @@ export default function OrdersPage() {
       breadcrumbs={[{ title: "Encomendas" }]}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+          <Tooltip title="Atualizar" placement="right" enterDelay={1000}>
             <div>
-              <IconButton size="small" aria-label="refresh">
+              <IconButton
+                size="small"
+                aria-label="refresh"
+                onClick={handleRefresh}
+              >
                 <RefreshIcon />
               </IconButton>
             </div>
@@ -79,16 +84,17 @@ export default function OrdersPage() {
             onClick={handleCreateClick}
             startIcon={<AddIcon />}
           >
-            Criar
+            Adicionar
           </Button>
         </Stack>
       }
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <CustomDataGrid
-          columns={orderColumns(handleRowEdit, handleRowDelete)}
-          rows={mockOrders}
-          loading={false}
+          columns={OrderColumns()}
+          rows={orders}
+          loading={isLoading}
+          handleRowClick={handleRowClick}
         />
       </Box>
     </PageContainer>

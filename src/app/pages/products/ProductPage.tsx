@@ -1,23 +1,25 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
-import PageContainer from "../../../components/PageContainer";
+import PageContainer, { Breadcrumb } from "../../components/PageContainer";
 import AddIcon from "@mui/icons-material/Add";
-import ProductForm from "./form/ProductForm";
-import { IProductSchema, productSchema } from "../services/ProductSchema";
+import ProductForm from "./components/form/ProductForm";
+import { IProductSchema, productSchema } from "./services/ProductSchema";
 import { useMatch, useNavigate, useParams } from "react-router";
-import { useEffect, useState } from "react";
-import { IProduct } from "../models/Product";
+import { useCallback, useEffect, useState } from "react";
+import { IProduct } from "./models/Product";
+import EditIcon from "@mui/icons-material/Edit";
+import SendIcon from "@mui/icons-material/Send";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   createProduct,
   getProduct,
   updateProduct
-} from "../services/ProductService";
-import { IMode } from "../../../models/Mode";
-import useNotifications from "../../../context/useNotifications/useNotifications";
-import { useLoading } from "../../../context/useLoading/useLoading";
-import { useDialogs } from "../../../context/useDialogs/useDialogs";
-import { useError } from "../../../context/useError/useError";
+} from "./services/ProductService";
+import { IMode } from "../../models/Mode";
+import useNotifications from "../../context/useNotifications/useNotifications";
+import { useLoading } from "../../context/useLoading/useLoading";
+import { useError } from "../../context/useError/useError";
 
 export default function ProductPage() {
   const baseUrl: string = "/products";
@@ -25,7 +27,6 @@ export default function ProductPage() {
   const notifications = useNotifications();
   const { startLoading, stopLoading } = useLoading();
   const { showError } = useError();
-  const dialogs = useDialogs();
 
   const methods = useForm<IProductSchema>({
     resolver: zodResolver(productSchema),
@@ -45,12 +46,19 @@ export default function ProductPage() {
   });
   const params = useParams<{ productId: string }>();
   const productId = params.productId ? Number(params.productId) : null;
-  const match = useMatch({ path: "/products/new", end: true });
   const [mode, setMode] = useState<IMode>(IMode.PREVIEW);
 
-  console.log(mode);
+  const matchNew = useMatch({ path: "/products/new", end: true });
+  const matchEdit = useMatch({ path: "/products/:productId/edit", end: true });
+  const matchDetail = useMatch({ path: "/products/:productId", end: true });
 
   useEffect(() => {
+    if (matchNew) setMode(IMode.ADD);
+    else if (matchEdit) setMode(IMode.EDIT);
+    else if (matchDetail) setMode(IMode.PREVIEW);
+  }, [matchNew, matchEdit, matchDetail]);
+
+  const loadData = useCallback(async () => {
     if (productId) {
       startLoading();
       getProduct(productId)
@@ -64,20 +72,17 @@ export default function ProductPage() {
           stopLoading();
           showError(e.message);
         });
-    } else if (!!match) {
-      setMode(IMode.ADD);
-    } else {
+    } else if (!matchNew) {
       void handleClose();
     }
   }, [productId]);
 
   useEffect(() => {
-    void reset({
-      id: product.id,
-      reference: product.reference,
-      unitPrice: product.unitPrice,
-      description: product.description
-    });
+    void loadData();
+  }, [productId]);
+
+  useEffect(() => {
+    void reset(product);
   }, [product]);
 
   const handleClose = () => navigate(baseUrl);
@@ -92,7 +97,8 @@ export default function ProductPage() {
           autoHideDuration: 5000
         });
 
-        void handleClose();
+        navigate(`/products/${product.id}`);
+        void loadData();
       })
       .catch((e: Error) => {
         console.error(e);
@@ -120,12 +126,24 @@ export default function ProductPage() {
   };
 
   const handleEdit = () => {
-    setMode(IMode.EDIT);
+    navigate(`/products/${productId}/edit`);
   };
 
   const handleRollback = () => {
-    setMode(IMode.PREVIEW);
+    navigate(`/products/${productId}`);
   };
+
+  const breadcrumbs: Breadcrumb[] = [
+    { title: "Produtos", path: baseUrl },
+    ...(mode === IMode.ADD
+      ? [{ title: "Novo" }]
+      : mode === IMode.EDIT
+      ? [
+          { title: product.reference, path: `${baseUrl}/${product.id}` },
+          { title: "Editar" }
+        ]
+      : [{ title: product.reference }])
+  ];
 
   return (
     <PageContainer
@@ -136,20 +154,19 @@ export default function ProductPage() {
           ? "Editar Produto"
           : product.reference
       }
-      breadcrumbs={[
-        { title: "Produtos", path: baseUrl },
-        { title: mode === IMode.ADD ? "Novo" : product.reference }
-      ]}
+      breadcrumbs={breadcrumbs}
       actions={
         <>
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={mode === IMode.EDIT ? handleRollback : handleClose}
-            startIcon={<AddIcon />}
-          >
-            Voltar
-          </Button>
+          {mode === IMode.EDIT && (
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={handleRollback}
+              startIcon={<CloseIcon />}
+            >
+              {mode === IMode.EDIT ? "Fechar" : "Voltar a lista"}
+            </Button>
+          )}
 
           <Button
             type="submit"
@@ -161,9 +178,17 @@ export default function ProductPage() {
                 ? handleEdit
                 : handleSumbitEdit
             )}
-            startIcon={<AddIcon />}
+            startIcon={
+              mode === IMode.ADD ? (
+                <AddIcon />
+              ) : mode === IMode.PREVIEW ? (
+                <EditIcon />
+              ) : (
+                <SendIcon />
+              )
+            }
           >
-            {mode === IMode.PREVIEW ? "editar" : "Submeter"}
+            {mode === IMode.PREVIEW ? "Editar" : "Submeter"}
           </Button>
         </>
       }

@@ -1,9 +1,9 @@
 import { BASE_API_URL } from "../../../config/variables";
 import { getData, postData, putData } from "../../../services/BaseService";
-import { IOrder } from "../models/Order";
+import { IOrder, IOrderTable } from "../models/Order";
 
-const getOrders = async (): Promise<IOrder[]> =>
-  await getData<IOrder[]>(`${BASE_API_URL}orders`);
+const getOrders = async (): Promise<IOrderTable[]> =>
+  await getData<IOrderTable[]>(`${BASE_API_URL}orders`);
 
 const getOrder = async (id: number): Promise<IOrder> =>
   await getData<IOrder>(`${BASE_API_URL}orders/${id}`);

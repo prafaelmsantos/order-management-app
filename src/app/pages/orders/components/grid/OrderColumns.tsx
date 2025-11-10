@@ -1,17 +1,14 @@
-import {
-  GridActionsCellItem,
-  GridColDef,
-  GridRenderCellParams
-} from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import dayjs from "dayjs";
-import { IOrder, OrderKeys } from "../../models/Order";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  IOrderTable,
+  OrderKeys,
+  OrderStatus,
+  OrderStatusColor,
+  OrderStatusLabel
+} from "../../models/Order";
 
-export default function orderColumns(
-  handleRowEdit: (id: number) => void,
-  handleRowDelete: (product: IOrder) => void
-): GridColDef<IOrder>[] {
+export default function OrderColumns(): GridColDef<IOrderTable>[] {
   return [
     {
       field: OrderKeys.id,
@@ -19,60 +16,52 @@ export default function orderColumns(
       width: 80
     },
     {
-      field: OrderKeys.client,
+      field: OrderKeys.customerFullName,
       headerName: "Cliente",
       flex: 1,
-      minWidth: 150,
-      renderCell: (params: GridRenderCellParams<IOrder>) =>
-        params.row.client?.fullName || "—"
+      minWidth: 200
     },
     {
-      field: OrderKeys.state,
+      field: OrderKeys.status,
       headerName: "Estado",
-      width: 150,
-      renderCell: (params: GridRenderCellParams<IOrder>) => {
-        const state = params.row.state;
-        const color =
-          state === "pendente"
-            ? "orange"
-            : state === "em processamento"
-            ? "blue"
-            : "green";
+      width: 140,
+      renderCell: (params: GridRenderCellParams<IOrderTable>) => {
+        const status = params.row.status as OrderStatus;
+        const label = OrderStatusLabel[status] ?? String(status);
+        const color = OrderStatusColor[status] ?? "#9e9e9e";
+
         return (
-          <span style={{ color, fontWeight: 500, textTransform: "capitalize" }}>
-            {state}
+          <span
+            key={params.row.id}
+            style={{
+              color,
+              fontWeight: 600,
+              textTransform: "capitalize"
+            }}
+          >
+            {label}
           </span>
         );
       }
     },
     {
-      field: OrderKeys.createdAt,
-      headerName: "Data",
-      width: 150,
-      renderCell: (params: GridRenderCellParams<IOrder>) =>
-        dayjs(params.row.createdAt).format("DD/MM/YYYY HH:mm")
+      field: OrderKeys.totalQuantity,
+      headerName: "Quantidade Total",
+      flex: 1,
+      minWidth: 80
     },
     {
-      field: "actions",
-      headerName: "Ações",
-      width: 100,
-      sortable: false,
-      filterable: false,
-      disableExport: true,
-      renderCell: (params: GridRenderCellParams<IOrder>) => (
-        <>
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Editar"
-            onClick={() => handleRowEdit(Number(params.row.id))}
-          />
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Excluir"
-            onClick={() => handleRowDelete(params.row)}
-          />
-        </>
-      )
+      field: OrderKeys.totalPrice,
+      headerName: "Preço Total (€)",
+      flex: 1,
+      minWidth: 80
+    },
+    {
+      field: OrderKeys.createdDate,
+      headerName: "Data",
+      width: 200,
+      renderCell: (params: GridRenderCellParams<IOrderTable>) =>
+        dayjs(params.row.createdDate).format("DD/MM/YYYY HH:mm")
     }
   ];
 }

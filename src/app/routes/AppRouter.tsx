@@ -1,14 +1,12 @@
 import { Navigate, useRoutes } from "react-router";
 import Dashboard from "../pages/dashboard/DashboardPage";
 import DashboardLayout from "../components/DashboardLayout";
-import EmployeeShow from "../pages/clients/components/EmployeeShow";
-import EmployeeEdit from "../pages/clients/components/EmployeeEdit";
 import ProductsPage from "../pages/products/ProductsPage";
-import ProductPage from "../pages/products/components/ProductPage";
+import ProductPage from "../pages/products/ProductPage";
 import OrdersPage from "../pages/orders/OrdersPage";
-import CreateOrder from "../pages/orders/components/CreateOrder";
-import CreateCustomer from "../pages/customers/components/CreateCustomer";
 import CustomersPage from "../pages/customers/CustomersPage";
+import CustomerPage from "../pages/customers/CustomerPage";
+import OrderPage from "../pages/orders/OrderPage";
 
 export default function AppRouter() {
   const Routes = [
@@ -17,8 +15,9 @@ export default function AppRouter() {
       children: [
         { path: "/", element: <Dashboard /> },
         { path: "/orders", element: <OrdersPage /> },
-        { path: "/orders/:orderId", element: <EmployeeShow /> },
-        { path: "/orders/new", element: <CreateOrder /> },
+        { path: "/orders/:orderId", element: <OrderPage /> },
+        { path: "/orders/:orderId/edit", element: <OrderPage /> },
+        { path: "/orders/new", element: <OrderPage /> },
 
         { path: "/products", element: <ProductsPage /> },
         { path: "/products/:productId", element: <ProductPage /> },
@@ -26,9 +25,9 @@ export default function AppRouter() {
         { path: "/products/new", element: <ProductPage /> },
 
         { path: "/customers", element: <CustomersPage /> },
-        { path: "/customers/:customerId", element: <EmployeeShow /> },
-        { path: "/customers/new", element: <CreateCustomer /> },
-        { path: "/customers/:customerId/edit", element: <EmployeeEdit /> },
+        { path: "/customers/:customerId", element: <CustomerPage /> },
+        { path: "/customers/:customerId/edit", element: <CustomerPage /> },
+        { path: "/customers/new", element: <CustomerPage /> },
 
         { path: "*", element: <Navigate to="/" replace /> }
       ]

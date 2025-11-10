@@ -7,82 +7,75 @@ import Tooltip from "@mui/material/Tooltip";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useNavigate } from "react-router";
-import { useDialogs } from "../../context/useDialogs/useDialogs";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/custom-data-grid";
-import { useEffect, useState } from "react";
-import { ICustomer } from "./models/Customer";
+import { useCallback, useEffect, useState } from "react";
+import { ICustomerTable } from "./models/Customer";
 import { getCustomers } from "./services/CustomerService";
-import columns from "./components/grid/CustomerColumns";
+import CustomerColumns from "./components/grid/CustomerColumns";
+import { GridEventListener } from "@mui/x-data-grid";
+import { useLoading } from "../../context/useLoading/useLoading";
 
 export default function CustomersPage() {
   const navigate = useNavigate();
-
-  const dialogs = useDialogs();
+  const [isLoading, setIsLoading] = useState(false);
   const notifications = useNotifications();
+  const { startLoading, stopLoading } = useLoading();
 
-  const handleCreateClick = React.useCallback(() => {
+  const handleCreateClick = useCallback(() => {
     navigate("/customers/new");
   }, [navigate]);
 
-  const handleRowEdit = (id: number) => {
-    navigate(`/customers/${id}/edit`);
-  };
+  const [customers, setCustomers] = useState<ICustomerTable[]>([]);
 
-  const handleRowDelete = async (employee: ICustomer) => {
-    const confirmed = await dialogs.confirm(
-      `Do you wish to delete ${employee.fullName}?`,
-      {
-        title: `Delete employee?`,
-        severity: "error",
-        okText: "Delete",
-        cancelText: "Cancel"
-      }
-    );
-
-    if (confirmed) {
-      try {
-        notifications.show("Employee deleted successfully.", {
-          severity: "success",
-          autoHideDuration: 3000
-        });
-        //loadData();
-      } catch (deleteError) {
-        notifications.show(
-          `Failed to delete employee. Reason:' ${
-            (deleteError as Error).message
-          }`,
-          {
-            severity: "error",
-            autoHideDuration: 3000
-          }
-        );
-      }
-    }
-  };
-
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-
-  useEffect(() => {
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    startLoading();
     getCustomers()
-      .then((data) => {
-        setCustomers(data);
-      })
+      .then((data) => setCustomers(data))
       .catch((e) => {
+        notifications.show("O carregamento de clientes falhou.", {
+          severity: "error",
+          autoHideDuration: 5000
+        });
         console.error(e);
       });
+
+    setIsLoading(false);
+    stopLoading();
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    if (!isLoading) {
+      loadData();
+    }
+  }, [isLoading, loadData]);
+
+  const handleRowClick = useCallback<GridEventListener<"rowClick">>(
+    ({ row }) => {
+      navigate(`/customers/${row.id}`);
+    },
+    [navigate]
+  );
 
   return (
     <PageContainer
-      title={"Clientes"}
-      breadcrumbs={[{ title: "Clientes" }]}
+      title={"Cientes"}
+      breadcrumbs={[{ title: "Cientes" }]}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+          <Tooltip title="Atualizar" placement="right" enterDelay={1000}>
             <div>
-              <IconButton size="small" aria-label="refresh">
+              <IconButton
+                size="small"
+                aria-label="refresh"
+                onClick={handleRefresh}
+              >
                 <RefreshIcon />
               </IconButton>
             </div>
@@ -92,16 +85,17 @@ export default function CustomersPage() {
             onClick={handleCreateClick}
             startIcon={<AddIcon />}
           >
-            Criar
+            Adicionar
           </Button>
         </Stack>
       }
     >
       <Box sx={{ flex: 1, width: "100%" }}>
         <CustomDataGrid
-          columns={columns(handleRowEdit, handleRowDelete)}
+          columns={CustomerColumns()}
           rows={customers}
-          loading={false}
+          loading={isLoading}
+          handleRowClick={handleRowClick}
         />
       </Box>
     </PageContainer>

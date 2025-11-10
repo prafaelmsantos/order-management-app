@@ -26,7 +26,7 @@ export default function ProductForm({ disabled }: IProductFormProps) {
       </Typography>
       <Divider sx={{ mb: 5 }} />
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <Controller
             name="reference"
