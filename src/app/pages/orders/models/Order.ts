@@ -1,4 +1,5 @@
 import { ICustomer } from "../../customers/models/Customer";
+import { IProduct } from "../../products/models/Product";
 
 export enum OrderStatus {
   Open = 0,
@@ -27,6 +28,7 @@ export const OrderStatusColor: Record<OrderStatus, string> = {
 export interface IProductOrder {
   orderId?: number;
   productId: number;
+  product?: IProduct;
   unitPrice: number;
   color?: string;
 

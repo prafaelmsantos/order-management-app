@@ -5,7 +5,7 @@ import {
   GridEventListener
 } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
-import { ptPTDataGrid } from "./translation-grid";
+import { ptPTDataGrid } from "./TranslationGrid";
 
 interface ITable {
   rows: any[];

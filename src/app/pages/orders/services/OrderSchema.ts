@@ -39,7 +39,7 @@ export const productOrderSchema = z.object({
   twelveYears: z.number().min(0, "Campo inválido."),
 
   totalQuantity: z.number().min(0, "Campo inválido."),
-  totalPrice: z.number().min(0, "Campo obrigatório.")
+  totalPrice: z.number().min(0, "Campo inválido.")
 });
 
 export const orderSchema = z.object({

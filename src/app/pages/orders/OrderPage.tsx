@@ -16,7 +16,7 @@ import { IOrderSchema, orderSchema } from "./services/OrderSchema";
 import { IOrder, OrderStatus } from "./models/Order";
 import { createOrder, getOrder, updateOrder } from "./services/OrderService";
 import OrderForm from "./components/form/OrderForm";
-import ExportPDFButton from "../customers/components/ExportPDFButton";
+import ExportButton from "../customers/components/ExportButton";
 
 export default function OrderPage() {
   const baseUrl: string = "/orders";
@@ -177,7 +177,7 @@ export default function OrderPage() {
             </Button>
           )}
           {mode === IMode.PREVIEW && (
-            <ExportPDFButton title="Nota de Encomenda" order={order} />
+            <ExportButton title="Nota de Encomenda" order={order} />
           )}
 
           <Button
