@@ -1,13 +1,3 @@
-import {
-  dataDisplayCustomizations,
-  dataGridCustomizations,
-  datePickersCustomizations,
-  feedbackCustomizations,
-  formInputCustomizations,
-  inputsCustomizations,
-  sidebarCustomizations,
-  surfacesCustomizations
-} from "./theme";
 import AppTheme from "./theme/AppTheme";
 import NotificationsProvider from "./context/useNotifications/NotificationsProvider";
 import DialogsProvider from "./context/useDialogs/DialogsProvider";
@@ -16,13 +6,9 @@ import AppRouter from "./routes/AppRouter";
 import { LoadingProvider } from "./context/useLoading/LoadingProvider";
 import { ErrorProvider } from "./context/useError/ErrorProvider";
 
-const themeComponents = {
-  ...dataGridCustomizations
-};
-
 function App() {
   return (
-    <AppTheme themeComponents={themeComponents}>
+    <AppTheme>
       <CssBaseline enableColorScheme />
       <NotificationsProvider>
         <DialogsProvider>
