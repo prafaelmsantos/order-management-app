@@ -34,8 +34,6 @@ export default function OrderPage() {
 
   const { reset, handleSubmit } = methods;
 
-  console.log();
-
   const navigate = useNavigate();
   const [order, setOrder] = useState<IOrder>({
     id: 0,

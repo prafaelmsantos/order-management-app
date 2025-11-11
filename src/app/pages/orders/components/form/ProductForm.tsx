@@ -5,9 +5,6 @@ import {
   AccordionSummary,
   Autocomplete,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   IconButton,
   TextField,
   Typography
@@ -21,12 +18,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { IProduct } from "../../../products/models/Product";
 import { getProducts } from "../../../products/services/ProductService";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { IProductOrder } from "../../models/Order";
 
-interface IProductFormProps {
-  disabled?: boolean;
-}
-
-export default function ProductForm({ disabled }: IProductFormProps) {
+export default function ProductForm({ disabled }: { disabled: boolean }) {
   const { startLoading, stopLoading } = useLoading();
 
   const {
@@ -35,8 +29,6 @@ export default function ProductForm({ disabled }: IProductFormProps) {
     watch,
     formState: { errors }
   } = useFormContext<IOrderSchema>();
-
-  console.log(errors);
 
   const [products, setProducts] = useState<IProduct[]>([]);
 
@@ -53,7 +45,7 @@ export default function ProductForm({ disabled }: IProductFormProps) {
 
   useEffect(() => {
     loadDataProducts();
-  }, []);
+  }, [loadDataProducts]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -92,36 +84,64 @@ export default function ProductForm({ disabled }: IProductFormProps) {
   };
 
   return (
-    <Grid item xs={12}>
-      <Card sx={{ mt: 2 }}>
-        <CardHeader
-          title="Produtos"
-          action={
-            !disabled && (
-              <Button
-                variant="contained"
-                size="small"
-                onClick={handleAddProduct}
-              >
-                <AddIcon fontSize="small" />
-              </Button>
-            )
-          }
-        />
-        <CardContent>
-          {/* Header */}
-          <Grid
-            container
-            spacing={1}
-            sx={{ fontWeight: 600, borderBottom: 1, mt: 2, mb: 3 }}
-          ></Grid>
+    <Grid container>
+      <Grid item xs={12} display="flex" justifyContent="flex-end">
+        {!disabled && (
+          <Button variant="contained" size="small" onClick={handleAddProduct}>
+            <AddIcon fontSize="small" />
+          </Button>
+        )}
+      </Grid>
 
-          {fields.map((fieldItem, idx) => (
+      {errors.productsOrders?.message}
+
+      {!!errors.productsOrders ? (
+        <Grid item xs={12}>
+          <Typography
+            variant="body2"
+            color="error"
+            align="center" // centraliza horizontalmente
+            sx={{ mt: 1 }}
+          >
+            {errors.productsOrders.message ?? "Ocorreu um erro nos produtos."}
+          </Typography>
+        </Grid>
+      ) : (
+        fields.map((productOrder, idx) => {
+          const product = watch(`productsOrders.${idx}.product`) as
+            | IProduct
+            | undefined;
+
+          const productOrderWatch = watch(`productsOrders.${idx}`) as
+            | IProductOrder
+            | undefined;
+
+          const totalQuantity = productOrderWatch
+            ? productOrderWatch.oneMonth +
+              productOrderWatch.threeMonths +
+              productOrderWatch.sixMonths +
+              productOrderWatch.twelveMonths +
+              productOrderWatch.eighteenMonths +
+              productOrderWatch.twentyFourMonths +
+              productOrderWatch.thirtySixMonths +
+              productOrderWatch.oneYear +
+              productOrderWatch.twoYears +
+              productOrderWatch.threeYears +
+              productOrderWatch.fourYears +
+              productOrderWatch.sixYears +
+              productOrderWatch.eightYears +
+              productOrderWatch.tenYears +
+              productOrderWatch.twelveYears
+            : 0;
+
+          const unitPrice = product ? product.unitPrice : 0;
+
+          return (
             <Grid
               container
-              spacing={1}
+              spacing={2}
               alignItems="center"
-              key={fieldItem.id}
+              key={productOrder.id}
               sx={{ mt: 1, mb: 2 }}
             >
               {/* Referência */}
@@ -130,21 +150,36 @@ export default function ProductForm({ disabled }: IProductFormProps) {
                   name={`productsOrders.${idx}.productId`}
                   control={control}
                   disabled={disabled}
-                  render={({ field: { onChange, value, ...others } }) => (
+                  render={({ field: { value, onChange } }) => (
                     <Autocomplete
-                      {...others}
+                      value={products.find((x) => x.id === value) ?? null}
                       options={products}
                       getOptionLabel={(option) => option.reference ?? ""}
                       isOptionEqualToValue={(option, value) =>
-                        option.id === value?.id
+                        option.id === value.id
                       }
-                      value={products.find((p) => p.id === value) ?? null}
+                      disabled={disabled}
+                      onChange={(_, product) => {
+                        if (product) {
+                          onChange(product.id);
+                          setValue(`productsOrders.${idx}.product`, {
+                            id: product.id,
+                            reference: product.reference,
+                            description: product.description,
+                            unitPrice: product.unitPrice
+                          });
+                        } else {
+                          onChange(0);
+                          setValue(`productsOrders.${idx}.product`, undefined);
+                        }
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           required
-                          label="Referência"
                           size="small"
+                          label="Produto"
+                          fullWidth
                           variant="outlined"
                           error={!!errors.productsOrders?.[idx]?.productId}
                           helperText={
@@ -152,25 +187,6 @@ export default function ProductForm({ disabled }: IProductFormProps) {
                           }
                         />
                       )}
-                      onChange={(_, selectedProduct) => {
-                        if (selectedProduct) {
-                          // Atualiza o id
-                          onChange(selectedProduct.id ?? 0);
-
-                          // Preenche automaticamente o preço
-                          setValue(
-                            `productsOrders.${idx}.unitPrice`,
-                            selectedProduct.unitPrice ?? 0
-                          );
-
-                          // (Opcional) Preenche a descrição
-                        } else {
-                          // Limpa os campos se o produto for removido
-                          onChange(0);
-                          setValue(`productsOrders.${idx}.unitPrice`, 0);
-                        }
-                      }}
-                      noOptionsText="Nenhum produto encontrado."
                     />
                   )}
                 />
@@ -179,11 +195,13 @@ export default function ProductForm({ disabled }: IProductFormProps) {
               {/* Preço */}
               <Grid item xs={4.5}>
                 <TextField
-                  label="Descrição."
-                  size="small"
-                  type="number"
+                  label="Descrição"
                   fullWidth
+                  variant="outlined"
                   disabled
+                  size="small"
+                  defaultValue={""}
+                  value={product?.description ?? ""}
                 />
               </Grid>
 
@@ -193,6 +211,7 @@ export default function ProductForm({ disabled }: IProductFormProps) {
                   name={`productsOrders.${idx}.color`}
                   control={control}
                   disabled={disabled}
+                  defaultValue={""}
                   render={({ field }) => (
                     <TextField {...field} label="Cor" size="small" fullWidth />
                   )}
@@ -201,52 +220,26 @@ export default function ProductForm({ disabled }: IProductFormProps) {
 
               {/* Preço */}
               <Grid item xs={1}>
-                <Controller
-                  name={`productsOrders.${idx}.unitPrice`}
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Preço Unit."
-                      size="small"
-                      fullWidth
-                      disabled
-                    />
-                  )}
+                <TextField
+                  label="Preço Unit. (€)"
+                  fullWidth
+                  variant="outlined"
+                  disabled
+                  type="number"
+                  size="small"
+                  defaultValue={""}
+                  value={product?.unitPrice ?? 0}
                 />
               </Grid>
 
               {/* Quantidade */}
               <Grid item xs={1}>
-                <Controller
-                  name={`productsOrders.${idx}.totalQuantity`}
-                  control={control}
+                <TextField
+                  label="Qtd. Total"
+                  size="small"
+                  fullWidth
+                  value={totalQuantity}
                   disabled
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Qtd. Total"
-                      size="small"
-                      fullWidth
-                      value={
-                        (watch(`productsOrders.${idx}.oneMonth`) || 0) +
-                        (watch(`productsOrders.${idx}.threeMonths`) || 0) +
-                        (watch(`productsOrders.${idx}.sixMonths`) || 0) +
-                        (watch(`productsOrders.${idx}.twelveMonths`) || 0) +
-                        (watch(`productsOrders.${idx}.eighteenMonths`) || 0) +
-                        (watch(`productsOrders.${idx}.twentyFourMonths`) || 0) +
-                        (watch(`productsOrders.${idx}.thirtySixMonths`) || 0) +
-                        (watch(`productsOrders.${idx}.oneYear`) || 0) +
-                        (watch(`productsOrders.${idx}.twoYears`) || 0) +
-                        (watch(`productsOrders.${idx}.threeYears`) || 0) +
-                        (watch(`productsOrders.${idx}.fourYears`) || 0) +
-                        (watch(`productsOrders.${idx}.sixYears`) || 0) +
-                        (watch(`productsOrders.${idx}.eightYears`) || 0) +
-                        (watch(`productsOrders.${idx}.tenYears`) || 0) +
-                        (watch(`productsOrders.${idx}.twelveYears`) || 0)
-                      }
-                    />
-                  )}
                 />
               </Grid>
 
@@ -255,31 +248,13 @@ export default function ProductForm({ disabled }: IProductFormProps) {
                 <TextField
                   label="Total"
                   size="small"
-                  value={(
-                    (watch(`productsOrders.${idx}.unitPrice`) || 0) *
-                    ((watch(`productsOrders.${idx}.oneMonth`) || 0) +
-                      (watch(`productsOrders.${idx}.threeMonths`) || 0) +
-                      (watch(`productsOrders.${idx}.sixMonths`) || 0) +
-                      (watch(`productsOrders.${idx}.twelveMonths`) || 0) +
-                      (watch(`productsOrders.${idx}.eighteenMonths`) || 0) +
-                      (watch(`productsOrders.${idx}.twentyFourMonths`) || 0) +
-                      (watch(`productsOrders.${idx}.thirtySixMonths`) || 0) +
-                      (watch(`productsOrders.${idx}.oneYear`) || 0) +
-                      (watch(`productsOrders.${idx}.twoYears`) || 0) +
-                      (watch(`productsOrders.${idx}.threeYears`) || 0) +
-                      (watch(`productsOrders.${idx}.fourYears`) || 0) +
-                      (watch(`productsOrders.${idx}.sixYears`) || 0) +
-                      (watch(`productsOrders.${idx}.eightYears`) || 0) +
-                      (watch(`productsOrders.${idx}.tenYears`) || 0) +
-                      (watch(`productsOrders.${idx}.twelveYears`) || 0))
-                  ).toFixed(2)}
+                  value={totalQuantity * unitPrice}
                   disabled
                   fullWidth
                 />
               </Grid>
 
               {/* Remover */}
-
               <Grid item xs={1} display="flex" justifyContent="center">
                 {!disabled && (
                   <IconButton
@@ -859,9 +834,9 @@ export default function ProductForm({ disabled }: IProductFormProps) {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-          ))}
-        </CardContent>
-      </Card>
+          );
+        })
+      )}
     </Grid>
   );
 }

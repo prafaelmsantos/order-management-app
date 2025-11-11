@@ -8,7 +8,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { useNavigate } from "react-router";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import PageContainer from "../../components/PageContainer";
-import CustomDataGrid from "../../components/grid/custom-data-grid";
+import CustomDataGrid from "../../components/grid/CustomDataGrid";
 import { useCallback, useEffect, useState } from "react";
 import { ICustomerTable } from "./models/Customer";
 import { getCustomersTable } from "./services/CustomerService";

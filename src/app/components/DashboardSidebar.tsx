@@ -15,7 +15,7 @@ import {
   getDrawerWidthTransitionMixin
 } from "./mixins";
 import DashboardSidebarPageItem from "./DashboardSidebarPageItem";
-import { NavItems, NavType } from "../routes/nav";
+import { NavItems, NavType } from "../routes/Nav";
 
 export interface DashboardSidebarProps {
   expanded?: boolean;

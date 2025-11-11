@@ -11,7 +11,7 @@ import { useDialogs } from "../../context/useDialogs/useDialogs";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import { deleteOne as deleteEmployee } from "./data/employees";
 import PageContainer from "../../components/PageContainer";
-import CustomDataGrid from "../../components/grid/custom-data-grid";
+import CustomDataGrid from "../../components/grid/CustomDataGrid";
 import columns from "./components/grid/ClientColumns";
 import { IClient } from "./models/client";
 import { mockClients } from "./data/clients";
