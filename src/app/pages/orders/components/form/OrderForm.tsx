@@ -1,51 +1,41 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Paper,
-  Typography
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ProductForm from "./ProductForm";
-import CustomerForm from "./CustomerForm";
+import { useState } from "react";
+import { Paper, Tabs, Tab, Box } from "@mui/material";
+import { IProductOrder } from "../../models/Order";
+import ProductNewForm from "./ProductNewForm";
 import DetailsForm from "./DetailsForm";
 
 interface IOrderFormProps {
   disabled: boolean;
+  productOrders: IProductOrder[];
 }
 
-export default function OrderForm({ disabled }: IOrderFormProps) {
+export default function OrderForm({
+  disabled,
+  productOrders
+}: IOrderFormProps) {
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
+
   return (
     <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
-      {/* Cliente */}
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Cliente</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <CustomerForm disabled={disabled} />
-        </AccordionDetails>
-      </Accordion>
+      <Tabs
+        value={tabIndex}
+        onChange={handleTabChange}
+        aria-label="order form tabs"
+      >
+        <Tab label="Detalhes" />
+        <Tab label="Produtos" />
+      </Tabs>
 
-      {/* Detalhes da Encomenda */}
-      <Accordion defaultExpanded sx={{ mt: 2 }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Detalhes da Encomenda</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <DetailsForm disabled={disabled} />
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Produtos */}
-      <Accordion defaultExpanded sx={{ mt: 2 }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Produtos</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <ProductForm disabled={disabled} />
-        </AccordionDetails>
-      </Accordion>
+      <Box sx={{ mt: 2 }}>
+        {tabIndex === 0 && <DetailsForm disabled={disabled} />}
+        {tabIndex === 1 && (
+          <ProductNewForm disabled={disabled} productOrders={productOrders} />
+        )}
+      </Box>
     </Paper>
   );
 }

@@ -26,6 +26,7 @@ export const OrderStatusColor: Record<OrderStatus, string> = {
 };
 
 export interface IProductOrder {
+  id?: number;
   orderId?: number;
   productId: number;
   product?: IProduct;

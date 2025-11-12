@@ -55,7 +55,14 @@ export default function CustomDataGrid({
             size: "small"
           }
         }}
-        localeText={ptPTDataGrid}
+        localeText={{
+          ...ptPTDataGrid,
+          paginationDisplayedRows: (params: {
+            from: number;
+            to: number;
+            count: number;
+          }) => `${params.from} de ${params.count}`
+        }}
         onStateChange={(data) =>
           setIdsToDelete && setIdsToDelete(data.rowSelection as number[])
         }

@@ -16,7 +16,7 @@ import { IOrderSchema, orderSchema } from "./services/OrderSchema";
 import { IOrder, OrderStatus } from "./models/Order";
 import { createOrder, getOrder, updateOrder } from "./services/OrderService";
 import OrderForm from "./components/form/OrderForm";
-import ExportButton from "../customers/components/ExportButton";
+import ExportButton from "./components/ExportButton";
 
 export default function OrderPage() {
   const baseUrl: string = "/orders";
@@ -206,7 +206,10 @@ export default function OrderPage() {
       }
     >
       <FormProvider {...methods}>
-        <OrderForm disabled={mode === IMode.PREVIEW} />
+        <OrderForm
+          disabled={mode === IMode.PREVIEW}
+          productOrders={order.productsOrders}
+        />
       </FormProvider>
     </PageContainer>
   );
