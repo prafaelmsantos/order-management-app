@@ -12,8 +12,8 @@ import {
   Tooltip
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import {
   DataGrid,
   GridColDef,
@@ -21,24 +21,21 @@ import {
   GridPaginationModel,
   gridClasses
 } from "@mui/x-data-grid";
+import { useFormContext, Controller } from "react-hook-form";
+
 import { getProducts } from "../../../products/services/ProductService";
 import { IProduct } from "../../../products/models/Product";
 import { IProductOrder } from "../../models/Order";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import { useFormContext } from "react-hook-form";
 import { IOrderSchema } from "../../services/OrderSchema";
 import { ptPTDataGrid } from "../../../../components/grid/TranslationGrid";
 
 export default function ProductNewForm({
-  disabled,
-  productOrders
+  disabled
 }: {
   disabled: boolean;
   productOrders: IProductOrder[];
 }) {
   const [products, setProducts] = useState<IProduct[]>([]);
-  const [orders, setOrders] = useState<IProductOrder[]>([]);
   const [openQuantities, setOpenQuantities] = useState<number | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -46,17 +43,10 @@ export default function ProductNewForm({
   });
 
   const { control, setValue, watch } = useFormContext<IOrderSchema>();
+  const productOrders = watch("productsOrders") || [];
 
-  useEffect(() => {
-    // Atualiza o campo "productsOrders" do React Hook Form
-    setValue("productsOrders", orders, {
-      shouldValidate: true,
-      shouldDirty: true
-    });
-  }, [orders, setValue]);
-
-  // Load products
-  const loadDataProducts = useCallback(async () => {
+  // Load products once
+  const loadProducts = useCallback(async () => {
     try {
       const data = await getProducts();
       setProducts(data);
@@ -66,79 +56,54 @@ export default function ProductNewForm({
   }, []);
 
   useEffect(() => {
-    loadDataProducts();
-  }, [loadDataProducts]);
+    loadProducts();
+  }, [loadProducts]);
 
+  /*   // Inicializa o RHF com os produtos do DTO
   useEffect(() => {
-    setOrders(productOrders);
-  }, [productOrders]);
+    setValue("productsOrders", productOrders || []);
+  }, [productOrders, setValue]); */
 
   const handleAddProduct = () => {
-    setOrders((prev) => [
-      ...prev,
-      {
-        id: orders.length ? Math.max(...orders.map((o) => o.id ?? 0)) + 1 : 1,
-        productId: 0,
-        description: "",
-        color: "",
-        unitPrice: 0,
-        zeroMonths: 0,
-        oneMonth: 0,
-        threeMonths: 0,
-        sixMonths: 0,
-        twelveMonths: 0,
-        eighteenMonths: 0,
-        twentyFourMonths: 0,
-        thirtySixMonths: 0,
-        oneYear: 0,
-        twoYears: 0,
-        threeYears: 0,
-        fourYears: 0,
-        sixYears: 0,
-        eightYears: 0,
-        tenYears: 0,
-        twelveYears: 0,
-        totalQuantity: 0,
-        totalPrice: 0
-      }
-    ]);
-  };
+    const newProduct: IProductOrder = {
+      id: productOrders.length
+        ? Math.max(...productOrders.map((o) => o.id ?? 0)) + 1
+        : 1,
+      productId: 0,
+      unitPrice: 0,
+      color: "",
+      zeroMonths: 0,
+      oneMonth: 0,
+      threeMonths: 0,
+      sixMonths: 0,
+      twelveMonths: 0,
+      eighteenMonths: 0,
+      twentyFourMonths: 0,
+      thirtySixMonths: 0,
+      oneYear: 0,
+      twoYears: 0,
+      threeYears: 0,
+      fourYears: 0,
+      sixYears: 0,
+      eightYears: 0,
+      tenYears: 0,
+      twelveYears: 0,
+      totalQuantity: 0,
+      totalPrice: 0
+    };
 
-  const handleRemoveProductByIndex = (index: number) => {
-    setOrders((prev) => {
-      const newOrders = [...prev]; // cria uma cópia do array
-      newOrders.splice(index, 1); // remove 1 item na posição `index`
-      return newOrders;
+    setValue("productsOrders", [...productOrders, newProduct], {
+      shouldValidate: true,
+      shouldDirty: true
     });
   };
 
-  console.log(orders);
-
-  const handleProductChange = (index: number, product: IProduct | null) => {
-    setOrders((prev) => {
-      const newOrders = [...prev];
-      if (product) {
-        newOrders[index].productId = product.id ?? 0;
-        newOrders[index].product = {
-          id: product.id,
-          reference: product.reference,
-          description: product.description,
-          unitPrice: product.unitPrice
-        };
-        newOrders[index].unitPrice = product.unitPrice;
-      } else {
-        newOrders[index].productId = 0;
-        newOrders[index].product = undefined;
-      }
-      return newOrders;
-    });
-  };
-
-  const handleColorChange = (index: number, color: string) => {
-    setOrders((prev) => {
-      const newOrders = [...prev];
-      newOrders[index].color = color;
-      return newOrders;
+  const handleRemoveProduct = (index: number) => {
+    const newOrders = [...productOrders];
+    newOrders.splice(index, 1);
+    setValue("productsOrders", newOrders, {
+      shouldValidate: true,
+      shouldDirty: true
     });
   };
 
@@ -163,7 +128,7 @@ export default function ProductNewForm({
 
   const rows = useMemo(
     () =>
-      orders.map((order, idx) => ({
+      productOrders.map((order, idx) => ({
         id: order.id,
         product: order.productId,
         description: order.product?.description,
@@ -171,7 +136,7 @@ export default function ProductNewForm({
         unitPrice: order.unitPrice,
         index: idx
       })),
-    [orders]
+    [productOrders]
   );
 
   const columns: GridColDef[] = [
@@ -179,28 +144,39 @@ export default function ProductNewForm({
       field: "product",
       headerName: "Produto",
       width: 250,
-      disableColumnMenu: true,
-      disableExport: true,
-      disableReorder: true,
-      filterable: false,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const idx = params.row.index;
-        return !disabled ? (
-          <Autocomplete
-            sx={{ mt: 1 }}
-            value={products.find((p) => p.id === orders[idx].productId) || null}
-            options={products}
-            getOptionLabel={(option) => option.reference}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            disabled={disabled}
-            onChange={(_, value) => handleProductChange(idx, value)}
-            renderInput={(params) => (
-              <TextField {...params} size="small" variant="outlined" />
+        return (
+          <Controller
+            name={`productsOrders.${idx}.productId`}
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                sx={{ mt: 1 }}
+                value={products.find((p) => p.id === field.value) || null}
+                options={products}
+                getOptionLabel={(option) => option.reference}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                disabled={disabled}
+                onChange={(_, value) => {
+                  field.onChange(value?.id ?? 0);
+                  setValue(`productsOrders.${idx}.product`, value || undefined);
+                  setValue(
+                    `productsOrders.${idx}.unitPrice`,
+                    value?.unitPrice ?? 0
+                  );
+                  setValue(
+                    `productsOrders.${idx}.product.description`,
+                    value?.description ?? ""
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} size="small" variant="outlined" />
+                )}
+              />
             )}
           />
-        ) : (
-          products.find((p) => p.id === orders[idx].productId)?.reference ?? ""
         );
       }
     },
@@ -208,35 +184,47 @@ export default function ProductNewForm({
       field: "description",
       headerName: "Descrição",
       width: 600,
-      disableColumnMenu: true,
-      disableExport: true,
-      disableReorder: true,
-      filterable: false,
-      sortable: false
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const idx = params.row.index;
+        return (
+          <Controller
+            name={`productsOrders.${idx}.product.description`}
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                size="small"
+                fullWidth
+                sx={{ mt: 1 }}
+                disabled
+              />
+            )}
+          />
+        );
+      }
     },
     {
       field: "color",
       headerName: "Cor",
       width: 200,
-      disableColumnMenu: true,
-      disableExport: true,
-      disableReorder: true,
-      filterable: false,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const idx = params.row.index;
-        return !disabled ? (
-          <TextField
-            sx={{ mt: 1 }}
-            size="small"
-            fullWidth
-            variant="outlined"
-            value={orders[idx].color}
-            disabled={disabled}
-            onChange={(e) => handleColorChange(idx, e.target.value)}
+        return (
+          <Controller
+            name={`productsOrders.${idx}.color`}
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                size="small"
+                fullWidth
+                sx={{ mt: 1 }}
+                disabled={disabled}
+              />
+            )}
           />
-        ) : (
-          orders[idx].color
         );
       }
     },
@@ -244,19 +232,33 @@ export default function ProductNewForm({
       field: "unitPrice",
       headerName: "Preço Unit. (€)",
       width: 150,
-      disableColumnMenu: true,
-      disableExport: true,
-      disableReorder: true,
-      filterable: false,
-      sortable: false
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const idx = params.row.index;
+        return (
+          <Controller
+            name={`productsOrders.${idx}.unitPrice`}
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                size="small"
+                fullWidth
+                sx={{ mt: 1 }}
+                disabled
+              />
+            )}
+          />
+        );
+      }
     },
     {
       field: "actions",
       headerName: "Ações",
       width: 100,
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const idx = params.row.index;
-
         return (
           <>
             <Tooltip title="Editar tamanhos">
@@ -267,14 +269,16 @@ export default function ProductNewForm({
                 <AddShoppingCartIcon />
               </IconButton>
             </Tooltip>
+            !disabled && (
             <Tooltip title="Remover">
               <IconButton
                 color="error"
-                onClick={() => handleRemoveProductByIndex(idx)}
+                onClick={() => handleRemoveProduct(idx)}
               >
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
+            )
           </>
         );
       }
@@ -282,16 +286,15 @@ export default function ProductNewForm({
   ];
 
   const displayedColumns = disabled ? columns.slice(0, -1) : columns;
+
   return (
     <>
-      <Box
-        style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}
-      >
+      <Box display="flex" justifyContent="flex-end" mb={1}>
         {!disabled && (
           <Button
             variant="contained"
-            onClick={handleAddProduct}
             startIcon={<AddIcon />}
+            onClick={handleAddProduct}
           >
             Adicionar
           </Button>
@@ -300,31 +303,12 @@ export default function ProductNewForm({
 
       <div style={{ height: 500, width: "100%" }}>
         <DataGrid
-          disableAutosize
-          disableVirtualization
-          disableColumnFilter
-          disableColumnMenu
-          disableColumnSorting
-          disableColumnSelector
-          disableDensitySelector
-          disableEval
-          disableRowSelectionExcludeModel
-          disableMultipleRowSelection
           rows={rows}
-          columns={displayedColumns}
+          columns={columns}
           pagination
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           disableRowSelectionOnClick
-          slotProps={{
-            loadingOverlay: {
-              variant: "circular-progress",
-              noRowsVariant: "circular-progress"
-            },
-            baseIconButton: {
-              size: "small"
-            }
-          }}
           localeText={{
             ...ptPTDataGrid,
             paginationDisplayedRows: (params: {
@@ -338,18 +322,8 @@ export default function ProductNewForm({
               outline: "transparent"
             },
             [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-              {
-                outline: "none"
-              },
-            [`& .${gridClasses.row}:hover`]: {
-              cursor: "pointer"
-            },
-            "& .MuiDataGrid-cellCheckbox": {
-              padding: "8px" // espaço interno
-            },
-            "& .MuiCheckbox-root": {
-              transform: "scale(1.4)" // aumenta o tamanho da checkbox
-            }
+              { outline: "none" },
+            [`& .${gridClasses.row}:hover`]: { cursor: "pointer" }
           }}
         />
       </div>
@@ -362,31 +336,29 @@ export default function ProductNewForm({
       >
         <DialogTitle>Tamanhos / Quantidades</DialogTitle>
         <DialogContent dividers>
-          {openQuantities !== null && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {quantityFields.map((field) => {
-                const idx = openQuantities!;
-                return (
-                  <TextField
-                    key={field.name}
-                    label={field.label}
-                    type="number"
-                    size="small"
-                    style={{ width: 100 }}
-                    value={(orders[idx] as any)[field.name] || 0}
-                    onChange={(e) => {
-                      const value = Math.max(Number(e.target.value), 0);
-                      setOrders((prev) => {
-                        const newOrders = [...prev];
-                        (newOrders[idx] as any)[field.name] = value;
-                        return newOrders;
-                      });
-                    }}
-                  />
-                );
-              })}
-            </div>
-          )}
+          {openQuantities !== null &&
+            quantityFields.map((field) => {
+              const idx = openQuantities!;
+              return (
+                <Controller
+                  key={field.name}
+                  name={`productsOrders.${idx}.${field.name}` as any}
+                  control={control}
+                  render={({ field: f }) => (
+                    <TextField
+                      {...f}
+                      label={field.label}
+                      type="number"
+                      size="small"
+                      style={{ width: 100 }}
+                      onChange={(e) =>
+                        f.onChange(Math.max(Number(e.target.value), 0))
+                      }
+                    />
+                  )}
+                />
+              );
+            })}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenQuantities(null)}>Fechar</Button>

@@ -13,7 +13,7 @@ import useNotifications from "../../context/useNotifications/useNotifications";
 import { useLoading } from "../../context/useLoading/useLoading";
 import { useError } from "../../context/useError/useError";
 import { IOrderSchema, orderSchema } from "./services/OrderSchema";
-import { IOrder, OrderStatus } from "./models/Order";
+import { IOrder } from "./models/Order";
 import { createOrder, getOrder, updateOrder } from "./services/OrderService";
 import OrderForm from "./components/form/OrderForm";
 import ExportButton from "./components/ExportButton";
@@ -38,7 +38,6 @@ export default function OrderPage() {
   const [order, setOrder] = useState<IOrder>({
     id: 0,
     customerId: 0,
-    status: OrderStatus.Open,
     paymentMethod: null,
     observations: null,
     totalQuantity: 0,
@@ -87,6 +86,7 @@ export default function OrderPage() {
   }, [orderId]);
 
   useEffect(() => {
+    console.log(order);
     void reset(order);
   }, [order]);
 

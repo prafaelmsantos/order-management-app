@@ -1,12 +1,11 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { Autocomplete, MenuItem, TextField } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import { IOrderSchema } from "../../services/OrderSchema";
 import { useCallback, useEffect, useState } from "react";
 import { useLoading } from "../../../../context/useLoading/useLoading";
 import { getCustomers } from "../../../customers/services/CustomerService";
 import { ICustomer } from "../../../customers/models/Customer";
-import { OrderStatus, OrderStatusLabel } from "../../models/Order";
 
 interface ICustomerFormProps {
   disabled: boolean;
@@ -151,33 +150,6 @@ export default function DetailsForm({ disabled }: ICustomerFormProps) {
                 fullWidth
                 variant="outlined"
               />
-            )}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <Controller
-            name="status"
-            control={control}
-            disabled={disabled}
-            defaultValue={OrderStatus.Open}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                select
-                label="Estado"
-                fullWidth
-                error={!!errors.status}
-                helperText={errors.status?.message}
-              >
-                {Object.values(OrderStatus)
-                  .filter((v) => typeof v === "number")
-                  .map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {OrderStatusLabel[status as OrderStatus]}
-                    </MenuItem>
-                  ))}
-              </TextField>
             )}
           />
         </Grid>

@@ -1,30 +1,6 @@
 import { ICustomer } from "../../customers/models/Customer";
 import { IProduct } from "../../products/models/Product";
 
-export enum OrderStatus {
-  Open = 0,
-  Pending,
-  Processing,
-  Delivered,
-  Cancelled
-}
-
-export const OrderStatusLabel: Record<OrderStatus, string> = {
-  [OrderStatus.Open]: "Aberta",
-  [OrderStatus.Pending]: "Pendente",
-  [OrderStatus.Processing]: "Em processamento",
-  [OrderStatus.Delivered]: "Entregue",
-  [OrderStatus.Cancelled]: "Cancelada"
-};
-
-export const OrderStatusColor: Record<OrderStatus, string> = {
-  [OrderStatus.Open]: "#1976d2",
-  [OrderStatus.Pending]: "#ed6c02",
-  [OrderStatus.Processing]: "#0288d1",
-  [OrderStatus.Delivered]: "#2e7d32",
-  [OrderStatus.Cancelled]: "#d32f2f"
-};
-
 export interface IProductOrder {
   id?: number;
   orderId?: number;
@@ -59,7 +35,6 @@ export interface IOrder {
   id?: number;
   customerId: number;
   customer?: ICustomer;
-  status: OrderStatus;
   paymentMethod: string | null;
   observations: string | null;
   totalQuantity: number;
@@ -72,8 +47,7 @@ export interface IOrderTable {
   customerId: number;
   customerFullName: string;
   customerTaxIdentificationNumber: string;
-  status: OrderStatus;
-  createdDate: Date;
+  createdDate: string;
   totalQuantity: number;
   totalPrice: number;
 }

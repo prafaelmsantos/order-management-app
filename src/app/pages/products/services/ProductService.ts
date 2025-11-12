@@ -1,6 +1,9 @@
 import { BASE_API_URL } from "../../../config/variables";
 import { getData, postData, putData } from "../../../services/BaseService";
-import { IProduct } from "../models/Product";
+import { IProduct, IProductTable } from "../models/Product";
+
+const getProductsTable = async (): Promise<IProductTable[]> =>
+  await getData<IProductTable[]>(`${BASE_API_URL}products/table`);
 
 const getProducts = async (): Promise<IProduct[]> =>
   await getData<IProduct[]>(`${BASE_API_URL}products`);
@@ -14,4 +17,10 @@ const createProduct = async (product: IProduct): Promise<IProduct> =>
 const updateProduct = async (product: IProduct): Promise<IProduct> =>
   await putData(`${BASE_API_URL}products/${product.id}`, product);
 
-export { getProducts, getProduct, createProduct, updateProduct };
+export {
+  getProducts,
+  getProductsTable,
+  getProduct,
+  createProduct,
+  updateProduct
+};

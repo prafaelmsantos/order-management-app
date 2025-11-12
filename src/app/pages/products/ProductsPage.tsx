@@ -9,9 +9,9 @@ import { useNavigate } from "react-router";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import PageContainer from "../../components/PageContainer";
 import CustomDataGrid from "../../components/grid/CustomDataGrid";
-import { IProduct } from "./models/Product";
+import { IProductTable } from "./models/Product";
 import { useCallback, useEffect, useState } from "react";
-import { getProducts } from "./services/ProductService";
+import { getProductsTable } from "./services/ProductService";
 import { GridEventListener } from "@mui/x-data-grid";
 import { useLoading } from "../../context/useLoading/useLoading";
 import ProductColumns from "./components/grid/ProductColumns";
@@ -26,12 +26,12 @@ export default function ProductsPage() {
     navigate("/products/new");
   }, [navigate]);
 
-  const [products, setProducts] = useState<IProduct[]>([]);
+  const [products, setProducts] = useState<IProductTable[]>([]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
     startLoading();
-    getProducts()
+    getProductsTable()
       .then((data) => setProducts(data))
       .catch((e) => {
         notifications.show("O carregamento de produtos falhou.", {
