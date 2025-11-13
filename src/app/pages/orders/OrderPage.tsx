@@ -1,5 +1,14 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { Button } from "@mui/material";
+import {
+  Box,
+  Button,
+  Paper,
+  Step,
+  StepLabel,
+  Stepper,
+  Tab,
+  Tabs
+} from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageContainer, { Breadcrumb } from "../../components/PageContainer";
 import AddIcon from "@mui/icons-material/Add";
@@ -17,6 +26,8 @@ import { IOrder } from "./models/Order";
 import { createOrder, getOrder, updateOrder } from "./services/OrderService";
 import OrderForm from "./components/form/OrderForm";
 import ExportButton from "./components/ExportButton";
+import ProductNewForm from "./components/form/ProductNewForm";
+import DetailsForm from "./components/form/DetailsForm";
 
 export default function OrderPage() {
   const baseUrl: string = "/orders";
@@ -154,6 +165,23 @@ export default function OrderPage() {
       : [{ title: "No." + order.id?.toString() }])
   ];
 
+  const [tabIndex, setTabIndex] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = ["Detalhes", "Produtos"];
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
+
+  const handleNext = () => {
+    setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
+  const handleBack = () => {
+    setActiveStep((prev) => Math.max(prev - 1, 0));
+  };
+
   return (
     <PageContainer
       title={
@@ -165,51 +193,103 @@ export default function OrderPage() {
       }
       breadcrumbs={breadcrumbs}
       actions={
-        <>
-          {mode === IMode.EDIT && (
+        activeStep === 1 && (
+          <>
+            {mode === IMode.EDIT && (
+              <Button
+                type="submit"
+                variant="contained"
+                onClick={handleRollback}
+                startIcon={<CloseIcon />}
+              >
+                Fechar
+              </Button>
+            )}
+            {mode === IMode.PREVIEW && (
+              <ExportButton title="Nota de Encomenda" order={order} />
+            )}
+
             <Button
               type="submit"
               variant="contained"
-              onClick={handleRollback}
-              startIcon={<CloseIcon />}
+              onClick={handleSubmit(
+                mode === IMode.ADD
+                  ? handleSumbitAdd
+                  : mode === IMode.PREVIEW
+                  ? handleEdit
+                  : handleSumbitEdit
+              )}
+              startIcon={
+                mode === IMode.ADD ? (
+                  <AddIcon />
+                ) : mode === IMode.PREVIEW ? (
+                  <EditIcon />
+                ) : (
+                  <SendIcon />
+                )
+              }
             >
-              {mode === IMode.EDIT ? "Fechar" : "Voltar a lista"}
+              {mode === IMode.PREVIEW ? "Editar" : "Submeter"}
             </Button>
-          )}
-          {mode === IMode.PREVIEW && (
-            <ExportButton title="Nota de Encomenda" order={order} />
-          )}
-
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit(
-              mode === IMode.ADD
-                ? handleSumbitAdd
-                : mode === IMode.PREVIEW
-                ? handleEdit
-                : handleSumbitEdit
-            )}
-            startIcon={
-              mode === IMode.ADD ? (
-                <AddIcon />
-              ) : mode === IMode.PREVIEW ? (
-                <EditIcon />
-              ) : (
-                <SendIcon />
-              )
-            }
-          >
-            {mode === IMode.PREVIEW ? "Editar" : "Submeter"}
-          </Button>
-        </>
+          </>
+        )
       }
     >
       <FormProvider {...methods}>
-        <OrderForm
-          disabled={mode === IMode.PREVIEW}
-          productOrders={order.productsOrders}
-        />
+        <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+          {mode === IMode.PREVIEW ? (
+            <>
+              {/* VIEW MODE: TABS */}
+              <Tabs
+                value={tabIndex}
+                onChange={handleTabChange}
+                aria-label="order form tabs"
+              >
+                <Tab label="Detalhes" />
+                <Tab label="Produtos" />
+              </Tabs>
+
+              <Box sx={{ mt: 2 }}>
+                {tabIndex === 0 && <DetailsForm disabled />}
+                {tabIndex === 1 && (
+                  <ProductNewForm disabled productOrders={[]} />
+                )}
+              </Box>
+            </>
+          ) : (
+            <>
+              {/* EDIT MODE: STEPPER */}
+              <Stepper activeStep={activeStep} alternativeLabel>
+                {steps.map((label) => (
+                  <Step key={label}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+              >
+                <Button disabled={activeStep === 0} onClick={handleBack}>
+                  Anterior
+                </Button>
+                <Button
+                  disabled={activeStep === steps.length - 1}
+                  onClick={handleNext}
+                >
+                  Próximo
+                </Button>
+              </Box>
+
+              <Box sx={{ mt: 2, minHeight: 400 }}>
+                {activeStep === 0 && <DetailsForm disabled={false} />}
+                {activeStep === 1 && (
+                  <ProductNewForm disabled={false} productOrders={[]} />
+                )}
+              </Box>
+            </>
+          )}
+        </Paper>
       </FormProvider>
     </PageContainer>
   );

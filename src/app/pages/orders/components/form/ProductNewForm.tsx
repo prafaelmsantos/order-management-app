@@ -269,23 +269,21 @@ export default function ProductNewForm({
                 <AddShoppingCartIcon />
               </IconButton>
             </Tooltip>
-            !disabled && (
-            <Tooltip title="Remover">
-              <IconButton
-                color="error"
-                onClick={() => handleRemoveProduct(idx)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-            )
+            {!disabled && (
+              <Tooltip title="Remover">
+                <IconButton
+                  color="error"
+                  onClick={() => handleRemoveProduct(idx)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </>
         );
       }
     }
   ];
-
-  const displayedColumns = disabled ? columns.slice(0, -1) : columns;
 
   return (
     <>
