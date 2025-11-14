@@ -2,6 +2,7 @@ import { BASE_API_URL } from "../../../config/variables";
 import { IBaseResponse } from "../../../models/BaseResponse";
 import {
   getData,
+  getPdfData,
   postData,
   postDeleteData,
   putData
@@ -14,6 +15,9 @@ const getOrders = async (): Promise<IOrderTable[]> =>
 const getOrder = async (id: number): Promise<IOrder> =>
   await getData<IOrder>(`${BASE_API_URL}orders/${id}`);
 
+const getOrderDoc = async (id: number): Promise<Blob> =>
+  await getPdfData(`${BASE_API_URL}orders/doc/${id}`);
+
 const createOrder = async (Order: IOrder): Promise<IOrder> =>
   await postData(`${BASE_API_URL}orders`, Order);
 
@@ -23,4 +27,11 @@ const updateOrder = async (Order: IOrder): Promise<IOrder> =>
 const deleteOrders = async (ids: number[]): Promise<IBaseResponse[]> =>
   await postDeleteData(`${BASE_API_URL}orders/delete`, ids);
 
-export { getOrders, getOrder, createOrder, updateOrder, deleteOrders };
+export {
+  getOrders,
+  getOrder,
+  getOrderDoc,
+  createOrder,
+  updateOrder,
+  deleteOrders
+};

@@ -1,5 +1,5 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { Box, Button, Paper, Tab, Tabs } from "@mui/material";
+import { Button } from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageContainer, { Breadcrumb } from "../../components/PageContainer";
 import AddIcon from "@mui/icons-material/Add";
@@ -13,10 +13,15 @@ import useNotifications from "../../context/useNotifications/useNotifications";
 import { useLoading } from "../../context/useLoading/useLoading";
 import { IOrderSchema, orderSchema } from "./services/OrderSchema";
 import { IOrder } from "./models/Order";
-import { createOrder, getOrder, updateOrder } from "./services/OrderService";
-import ProductNewForm from "./components/form/ProductNewForm";
-import DetailsForm from "./components/form/DetailsForm";
+import {
+  createOrder,
+  getOrder,
+  getOrderDoc,
+  updateOrder
+} from "./services/OrderService";
+import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
 import { useModal } from "../../context/useModal/useModal";
+import OrderForm from "./components/form/OrderForm";
 
 export default function OrderPage() {
   const baseUrl: string = "/orders";
@@ -75,7 +80,7 @@ export default function OrderPage() {
         .catch((e: Error) => {
           void handleClose();
           stopLoading();
-          showError(e.message);
+          showError(e.message, "Erro ao tentar carregar encomendas");
         });
     } else if (!matchNew) {
       void handleClose();
@@ -87,7 +92,6 @@ export default function OrderPage() {
   }, [orderId]);
 
   useEffect(() => {
-    console.log(order);
     void reset(order);
   }, [order]);
 
@@ -97,7 +101,6 @@ export default function OrderPage() {
     startLoading();
     updateOrder(order)
       .then(() => {
-        stopLoading();
         notifications.show("Encomenda atualizada com sucesso!", {
           severity: "success",
           autoHideDuration: 5000
@@ -105,11 +108,11 @@ export default function OrderPage() {
 
         navigate(`/orders/${order.id}`);
         void loadData();
+        stopLoading();
       })
       .catch((e: Error) => {
-        console.error(e);
+        showError(e.message, "Erro ao tentar atualizar a encomenda");
         stopLoading();
-        showError(e.message);
       });
   };
 
@@ -117,17 +120,16 @@ export default function OrderPage() {
     startLoading();
     createOrder(order)
       .then(() => {
-        stopLoading();
         notifications.show("Encomenda criada com sucesso!", {
           severity: "success",
           autoHideDuration: 5000
         });
         void handleClose();
+        stopLoading();
       })
       .catch((e: Error) => {
-        console.error(e);
+        showError(e.message, "Erro ao tentar criar a encomenda");
         stopLoading();
-        showError(e.message);
       });
   };
 
@@ -155,10 +157,17 @@ export default function OrderPage() {
       : [{ title: "Nº" + (order.id ?? 0).toString() }])
   ];
 
-  const [tabIndex, setTabIndex] = useState(0);
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setTabIndex(newValue);
+  const handleReportOrder = async () => {
+    if (orderId) {
+      const blob = await getOrderDoc(orderId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `nota_de_encomenda_n_${orderId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
   };
 
   return (
@@ -173,6 +182,16 @@ export default function OrderPage() {
       breadcrumbs={breadcrumbs}
       actions={
         <>
+          {mode !== IMode.ADD && (
+            <Button
+              variant="contained"
+              startIcon={<SimCardDownloadIcon />}
+              onClick={handleReportOrder}
+            >
+              Descarregar
+            </Button>
+          )}
+
           {mode === IMode.EDIT && (
             <Button
               type="submit"
@@ -210,21 +229,7 @@ export default function OrderPage() {
       }
     >
       <FormProvider {...methods}>
-        <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
-          <Tabs
-            value={tabIndex}
-            onChange={handleTabChange}
-            aria-label="order form tabs"
-          >
-            <Tab label="Detalhes" />
-            <Tab label="Produtos" />
-          </Tabs>
-
-          <Box sx={{ mt: 2 }}>
-            {tabIndex === 0 && <DetailsForm disabled />}
-            {tabIndex === 1 && <ProductNewForm disabled productOrders={[]} />}
-          </Box>
-        </Paper>
+        <OrderForm disabled={mode === IMode.PREVIEW} />
       </FormProvider>
     </PageContainer>
   );

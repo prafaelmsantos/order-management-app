@@ -16,13 +16,13 @@ export default function OrderColumns(): GridColDef<IOrderTable>[] {
     },
     {
       field: OrderKeys.totalQuantity,
-      headerName: "Quantidade Total",
+      headerName: "Total Produtos (Unid.)",
       flex: 1,
       minWidth: 80
     },
     {
       field: OrderKeys.totalPrice,
-      headerName: "Preço Total (€)",
+      headerName: "Total Produtos (€)",
       flex: 1,
       minWidth: 80
     },

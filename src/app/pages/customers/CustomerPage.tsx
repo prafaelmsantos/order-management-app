@@ -76,8 +76,8 @@ export default function CustomerPage() {
         })
         .catch((e: Error) => {
           void handleClose();
+          showError(e.message, "Erro ao tentar carregar o cliente");
           stopLoading();
-          showError(e.message);
         });
     } else if (!matchNew) {
       void handleClose();
@@ -98,7 +98,6 @@ export default function CustomerPage() {
     startLoading();
     updateCustomer(customer)
       .then(() => {
-        stopLoading();
         notifications.show("Cliente atualizado com sucesso!", {
           severity: "success",
           autoHideDuration: 5000
@@ -106,10 +105,11 @@ export default function CustomerPage() {
 
         navigate(`/customers/${customer.id}`);
         void loadData();
+        stopLoading();
       })
       .catch((e: Error) => {
+        showError(e.message, "Erro ao tentar atualizar o cliente");
         stopLoading();
-        showError(e.message);
       });
   };
 
@@ -117,16 +117,16 @@ export default function CustomerPage() {
     startLoading();
     createCustomer(customer)
       .then(() => {
-        stopLoading();
         notifications.show("Cliente criado com sucesso!", {
           severity: "success",
           autoHideDuration: 5000
         });
         void handleClose();
+        stopLoading();
       })
       .catch((e: Error) => {
+        showError(e.message, "Erro ao tentar criar o cliente");
         stopLoading();
-        showError(e.message);
       });
   };
 

@@ -104,8 +104,8 @@ export default function ProductPage() {
         void loadData();
       })
       .catch((e: Error) => {
+        showError(e.message, "Erro ao tentar atualizar o cliente");
         stopLoading();
-        showError(e.message);
       });
   };
 
@@ -121,8 +121,8 @@ export default function ProductPage() {
         void handleClose();
       })
       .catch((e: Error) => {
+        showError(e.message, "Erro ao tentar criar o cliente");
         stopLoading();
-        showError(e.message);
       });
   };
 
@@ -171,16 +171,6 @@ export default function ProductPage() {
       breadcrumbs={breadcrumbs}
       actions={
         <>
-          {mode === IMode.EDIT && (
-            <Button
-              type="submit"
-              variant="contained"
-              onClick={handleRollback}
-              startIcon={<CloseIcon />}
-            >
-              {mode === IMode.EDIT ? "Fechar" : "Voltar a lista"}
-            </Button>
-          )}
           {mode !== IMode.ADD && (
             <Button
               variant="contained"
@@ -190,6 +180,18 @@ export default function ProductPage() {
               Relatório
             </Button>
           )}
+
+          {mode === IMode.EDIT && (
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={handleRollback}
+              startIcon={<CloseIcon />}
+            >
+              Fechar
+            </Button>
+          )}
+
           <Button
             type="submit"
             variant="contained"

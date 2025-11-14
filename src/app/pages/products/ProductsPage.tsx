@@ -27,11 +27,14 @@ export default function ProductsPage() {
   const loadData = useCallback(async () => {
     startLoading();
     getProductsTable()
-      .then((data) => setProducts(data))
-      .catch((e) =>
-        showError(e.message, "Houve um erro ao tentar carregar os produtos.")
-      );
-    stopLoading();
+      .then((data) => {
+        setProducts(data);
+        stopLoading();
+      })
+      .catch((e) => {
+        showError(e.message, "Houve um erro ao tentar carregar os produtos.");
+        stopLoading();
+      });
   }, []);
 
   useEffect(() => {
@@ -77,11 +80,10 @@ export default function ProductsPage() {
         }
         handleRefresh();
       })
-      .catch((e: Error) =>
-        showError(e.message, "Houve um erro ao tentar apagar produtos")
-      );
-
-    stopLoading();
+      .catch((e: Error) => {
+        showError(e.message, "Houve um erro ao tentar apagar produtos");
+        stopLoading();
+      });
   }, [idsToDelete]);
 
   const handleDeleteModal = useCallback(() => {

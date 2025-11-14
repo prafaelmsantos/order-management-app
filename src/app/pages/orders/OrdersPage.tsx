@@ -27,11 +27,14 @@ export default function OrdersPage() {
   const loadData = useCallback(async () => {
     startLoading();
     getOrders()
-      .then((data) => setOrders(data))
-      .catch((e) =>
-        showError(e.message, "Houve um erro ao tentar carregar as encomendas.")
-      );
-    stopLoading();
+      .then((data) => {
+        setOrders(data);
+        stopLoading();
+      })
+      .catch((e) => {
+        showError(e.message, "Houve um erro ao tentar carregar as encomendas.");
+        stopLoading();
+      });
   }, []);
 
   useEffect(() => {
@@ -79,18 +82,17 @@ export default function OrdersPage() {
         }
         handleRefresh();
       })
-      .catch((e: Error) =>
-        showError(e.message, "Houve um erro ao tentar apagar encomendas")
-      );
-
-    stopLoading();
+      .catch((e: Error) => {
+        showError(e.message, "Houve um erro ao tentar apagar encomendas");
+        stopLoading();
+      });
   }, [idsToDelete]);
 
   const handleDeleteModal = useCallback(() => {
     showWarning(
       `Tem a certeza que pretende apagar ${
         idsToDelete.length === 1
-          ? "a encomenda selecionadoa"
+          ? "a encomenda selecionada"
           : "as encomendas selecionadas"
       }?`,
       handleDeleteClick

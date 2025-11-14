@@ -27,11 +27,14 @@ export default function CustomersPage() {
   const loadData = useCallback(async () => {
     startLoading();
     getCustomersTable()
-      .then((data) => setCustomers(data))
-      .catch((e: Error) =>
-        showError(e.message, "Houve um erro ao tentar carregar os clientes.")
-      );
-    stopLoading();
+      .then((data) => {
+        setCustomers(data);
+        stopLoading();
+      })
+      .catch((e: Error) => {
+        showError(e.message, "Erro ao tentar carregar os clientes.");
+        stopLoading();
+      });
   }, []);
 
   useEffect(() => {
@@ -77,11 +80,10 @@ export default function CustomersPage() {
         }
         handleRefresh();
       })
-      .catch((e: Error) =>
-        showError(e.message, "Houve um erro ao tentar apagar clientes")
-      );
-
-    stopLoading();
+      .catch((e: Error) => {
+        showError(e.message, "Houve um erro ao tentar apagar clientes");
+        stopLoading();
+      });
   }, [idsToDelete]);
 
   const handleDeleteModal = useCallback(() => {

@@ -80,7 +80,8 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
             )}
           />
         </Grid>
-
+      </Grid>
+      <Grid container spacing={2} sx={{ mt: 2 }}>
         <Grid item xs={12} sm={8}>
           <Controller
             name="address"
