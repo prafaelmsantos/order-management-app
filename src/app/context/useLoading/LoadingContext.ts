@@ -4,6 +4,7 @@ export type StartLoading = () => void;
 export type StopLoading = () => void;
 
 export interface LoadingContextType {
+  loading: boolean;
   startLoading: StartLoading;
   stopLoading: StopLoading;
 }

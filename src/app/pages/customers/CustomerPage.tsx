@@ -11,7 +11,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { IMode } from "../../models/Mode";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import { useLoading } from "../../context/useLoading/useLoading";
-import { useError } from "../../context/useError/useError";
 import { ICustomer } from "./models/Customer";
 import { customerSchema, ICustomerSchema } from "./services/CustomerSchema";
 import {
@@ -20,13 +19,18 @@ import {
   updateCustomer
 } from "./services/CustomerService";
 import ClientForm from "./components/form/CustomerForm";
+import { useModal } from "../../context/useModal/useModal";
 
 export default function CustomerPage() {
   const baseUrl: string = "/customers";
 
+  const navigate = useNavigate();
+  const params = useParams<{ customerId: string }>();
+  const customerId = params.customerId ? Number(params.customerId) : null;
+
   const notifications = useNotifications();
   const { startLoading, stopLoading } = useLoading();
-  const { showError } = useError();
+  const { showError } = useModal();
 
   const methods = useForm<ICustomerSchema>({
     resolver: zodResolver(customerSchema),
@@ -37,7 +41,6 @@ export default function CustomerPage() {
 
   const { reset, handleSubmit } = methods;
 
-  const navigate = useNavigate();
   const [customer, setCustomer] = useState<ICustomer>({
     id: 0,
     fullName: "",
@@ -47,8 +50,7 @@ export default function CustomerPage() {
     postalCode: "",
     city: ""
   });
-  const params = useParams<{ customerId: string }>();
-  const customerId = params.customerId ? Number(params.customerId) : null;
+
   const [mode, setMode] = useState<IMode>(IMode.PREVIEW);
 
   const matchNew = useMatch({ path: "/customers/new", end: true });
@@ -73,7 +75,6 @@ export default function CustomerPage() {
           stopLoading();
         })
         .catch((e: Error) => {
-          console.error(e);
           void handleClose();
           stopLoading();
           showError(e.message);
@@ -107,7 +108,6 @@ export default function CustomerPage() {
         void loadData();
       })
       .catch((e: Error) => {
-        console.error(e);
         stopLoading();
         showError(e.message);
       });
@@ -125,7 +125,6 @@ export default function CustomerPage() {
         void handleClose();
       })
       .catch((e: Error) => {
-        console.error(e);
         stopLoading();
         showError(e.message);
       });
@@ -170,7 +169,7 @@ export default function CustomerPage() {
               onClick={handleRollback}
               startIcon={<CloseIcon />}
             >
-              {mode === IMode.EDIT ? "Fechar" : "Voltar a lista"}
+              Fechar
             </Button>
           )}
 

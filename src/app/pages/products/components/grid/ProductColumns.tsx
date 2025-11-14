@@ -18,7 +18,7 @@ export default function ProductColumns(): GridColDef<IProductTable>[] {
       field: ProductKeys.description,
       headerName: "Descrição",
       flex: 1,
-      minWidth: 200
+      minWidth: 250
     },
     {
       field: ProductKeys.unitPrice,

@@ -16,7 +16,7 @@ export const LoadingProvider: React.FC<LoadingProviderProps> = ({
   const stopLoading = React.useCallback(() => setLoading(false), []);
 
   const contextValue: LoadingContextType = React.useMemo(
-    () => ({ startLoading, stopLoading }),
+    () => ({ loading, startLoading, stopLoading }),
     [stopLoading, stopLoading]
   );
 

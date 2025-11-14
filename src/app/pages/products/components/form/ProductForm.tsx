@@ -1,32 +1,23 @@
 import { Controller, useFormContext } from "react-hook-form";
-import {
-  TextField,
-  Typography,
-  Paper,
-  Divider,
-  InputAdornment
-} from "@mui/material";
+import { TextField, Typography, Divider, InputAdornment } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import { IProductSchema } from "../../services/ProductSchema";
+import { Box } from "@mui/system";
 
-interface IProductFormProps {
-  disabled?: boolean;
-}
-
-export default function ProductForm({ disabled }: IProductFormProps) {
+export default function ProductForm({ disabled }: { disabled: boolean }) {
   const {
     control,
     formState: { errors }
   } = useFormContext<IProductSchema>();
 
   return (
-    <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
         Detalhes do Produto
       </Typography>
       <Divider sx={{ mb: 5 }} />
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
           <Controller
             name="reference"
@@ -77,7 +68,7 @@ export default function ProductForm({ disabled }: IProductFormProps) {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ mt: 2 }}>
           <Controller
             name="description"
             control={control}
@@ -98,6 +89,6 @@ export default function ProductForm({ disabled }: IProductFormProps) {
           />
         </Grid>
       </Grid>
-    </Paper>
+    </Box>
   );
 }

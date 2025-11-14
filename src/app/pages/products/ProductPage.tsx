@@ -1,5 +1,5 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { Button } from "@mui/material";
+import { Button, Paper } from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageContainer, { Breadcrumb } from "../../components/PageContainer";
 import AddIcon from "@mui/icons-material/Add";
@@ -14,19 +14,25 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   createProduct,
   getProduct,
+  getProductReport,
   updateProduct
 } from "./services/ProductService";
 import { IMode } from "../../models/Mode";
 import useNotifications from "../../context/useNotifications/useNotifications";
 import { useLoading } from "../../context/useLoading/useLoading";
-import { useError } from "../../context/useError/useError";
+import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
+import { useModal } from "../../context/useModal/useModal";
 
 export default function ProductPage() {
   const baseUrl: string = "/products";
 
+  const navigate = useNavigate();
+  const params = useParams<{ productId: string }>();
+  const productId = params.productId ? Number(params.productId) : null;
+
   const notifications = useNotifications();
   const { startLoading, stopLoading } = useLoading();
-  const { showError } = useError();
+  const { showError } = useModal();
 
   const methods = useForm<IProductSchema>({
     resolver: zodResolver(productSchema),
@@ -37,15 +43,13 @@ export default function ProductPage() {
 
   const { reset, handleSubmit } = methods;
 
-  const navigate = useNavigate();
   const [product, setProduct] = useState<IProduct>({
     id: 0,
     reference: "",
     description: null,
     unitPrice: 0
   });
-  const params = useParams<{ productId: string }>();
-  const productId = params.productId ? Number(params.productId) : null;
+
   const [mode, setMode] = useState<IMode>(IMode.PREVIEW);
 
   const matchNew = useMatch({ path: "/products/new", end: true });
@@ -67,7 +71,6 @@ export default function ProductPage() {
           stopLoading();
         })
         .catch((e: Error) => {
-          console.error(e);
           void handleClose();
           stopLoading();
           showError(e.message);
@@ -101,7 +104,6 @@ export default function ProductPage() {
         void loadData();
       })
       .catch((e: Error) => {
-        console.error(e);
         stopLoading();
         showError(e.message);
       });
@@ -119,7 +121,6 @@ export default function ProductPage() {
         void handleClose();
       })
       .catch((e: Error) => {
-        console.error(e);
         stopLoading();
         showError(e.message);
       });
@@ -145,6 +146,19 @@ export default function ProductPage() {
       : [{ title: product.reference }])
   ];
 
+  const handleReportProduct = async () => {
+    if (productId) {
+      const blob = await getProductReport(productId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `relatorio_produto_${productId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+  };
+
   return (
     <PageContainer
       title={
@@ -167,7 +181,15 @@ export default function ProductPage() {
               {mode === IMode.EDIT ? "Fechar" : "Voltar a lista"}
             </Button>
           )}
-
+          {mode !== IMode.ADD && (
+            <Button
+              variant="contained"
+              startIcon={<SimCardDownloadIcon />}
+              onClick={handleReportProduct}
+            >
+              Relatório
+            </Button>
+          )}
           <Button
             type="submit"
             variant="contained"
@@ -194,7 +216,9 @@ export default function ProductPage() {
       }
     >
       <FormProvider {...methods}>
-        <ProductForm disabled={mode === IMode.PREVIEW} />
+        <Paper elevation={3} sx={{ p: 3 }}>
+          <ProductForm disabled={mode === IMode.PREVIEW} />
+        </Paper>
       </FormProvider>
     </PageContainer>
   );

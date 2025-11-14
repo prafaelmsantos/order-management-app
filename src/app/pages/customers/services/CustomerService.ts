@@ -1,5 +1,11 @@
 import { BASE_API_URL } from "../../../config/variables";
-import { getData, postData, putData } from "../../../services/BaseService";
+import { IBaseResponse } from "../../../models/BaseResponse";
+import {
+  getData,
+  postData,
+  postDeleteData,
+  putData
+} from "../../../services/BaseService";
 import { ICustomer, ICustomerTable } from "../models/Customer";
 
 const getCustomersTable = async (): Promise<ICustomerTable[]> =>
@@ -17,10 +23,14 @@ const createCustomer = async (customer: ICustomer): Promise<ICustomer> =>
 const updateCustomer = async (customer: ICustomer): Promise<ICustomer> =>
   await putData(`${BASE_API_URL}customers/${customer.id}`, customer);
 
+const deleteCustomers = async (ids: number[]): Promise<IBaseResponse[]> =>
+  await postDeleteData(`${BASE_API_URL}customers/delete`, ids);
+
 export {
   getCustomersTable,
   getCustomers,
   getCustomer,
   createCustomer,
-  updateCustomer
+  updateCustomer,
+  deleteCustomers
 };

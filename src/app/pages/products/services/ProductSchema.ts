@@ -4,7 +4,7 @@ export const productSchema = z.object({
   id: z.number().optional(),
   reference: z.string().trim().min(1, "Campo obrigatório."),
   description: z.string().nullable(),
-  unitPrice: z.number().min(0, "Valor inválido!")
+  unitPrice: z.number().min(1, "Valor inválido!")
 });
 
 export type IProductSchema = z.infer<typeof productSchema>;

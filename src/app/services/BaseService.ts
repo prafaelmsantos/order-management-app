@@ -1,3 +1,5 @@
+import { IBaseResponse } from "../models/BaseResponse";
+
 interface IErrorResponse {
   message?: string;
 }
@@ -7,22 +9,22 @@ export async function getErrorMessage(response: Response): Promise<string> {
     return (
       (await (response.json() as Promise<IErrorResponse>)).message ||
       response.statusText ||
-      'error'
+      "error"
     );
   } catch {
-    return response.statusText || 'error';
+    return response.statusText || "error";
   }
 }
 
-export const getSessionHeaders = (contentType = 'application/json') => {
+export const getSessionHeaders = (contentType = "application/json") => {
   return {
-    'Content-type': contentType
+    "Content-type": contentType
   };
 };
 
 export async function getData<T>(endpoint: string): Promise<T> {
   const response = await fetch(endpoint, {
-    method: 'GET',
+    method: "GET",
     headers: getSessionHeaders()
   });
   if (!response.ok) {
@@ -31,9 +33,20 @@ export async function getData<T>(endpoint: string): Promise<T> {
   return (await response.json()) as Promise<T>;
 }
 
+export async function getPdfData(endpoint: string): Promise<Blob> {
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: getSessionHeaders()
+  });
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+  return await response.blob();
+}
+
 export async function putData<T>(endpoint: string, body: T): Promise<T> {
   const response = await fetch(endpoint, {
-    method: 'PUT',
+    method: "PUT",
     headers: getSessionHeaders(),
     body: JSON.stringify(body)
   });
@@ -45,7 +58,7 @@ export async function putData<T>(endpoint: string, body: T): Promise<T> {
 
 export async function postData<T>(endpoint: string, body: T): Promise<T> {
   const response = await fetch(endpoint, {
-    method: 'POST',
+    method: "POST",
     headers: getSessionHeaders(),
     body: JSON.stringify(body)
   });
@@ -55,13 +68,17 @@ export async function postData<T>(endpoint: string, body: T): Promise<T> {
   return (await response.json()) as Promise<T>;
 }
 
-export async function deleteData<T>(endpoint: string): Promise<T> {
+export async function postDeleteData(
+  endpoint: string,
+  body: number[]
+): Promise<IBaseResponse[]> {
   const response = await fetch(endpoint, {
-    method: 'DELETE',
-    headers: getSessionHeaders()
+    method: "POST",
+    headers: getSessionHeaders(),
+    body: JSON.stringify(body)
   });
   if (!response.ok) {
     throw new Error(response.statusText);
   }
-  return (await response.json()) as Promise<T>;
+  return (await response.json()) as Promise<IBaseResponse[]>;
 }

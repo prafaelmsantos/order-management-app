@@ -154,7 +154,7 @@ export default function DetailsForm({ disabled }: ICustomerFormProps) {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ mt: 1 }}>
           <Controller
             name="observations"
             control={control}
@@ -167,7 +167,7 @@ export default function DetailsForm({ disabled }: ICustomerFormProps) {
                 fullWidth
                 variant="outlined"
                 multiline
-                rows={4}
+                rows={8}
               />
             )}
           />
