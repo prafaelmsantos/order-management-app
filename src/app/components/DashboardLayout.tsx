@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import { Outlet } from "react-router";
 import DashboardHeader from "./DashboardHeader";
-import SitemarkIcon from "./SitemarkIcon";
 import DashboardSidebar from "./DashboardSidebar";
 
 export default function DashboardLayout() {
@@ -58,7 +57,6 @@ export default function DashboardLayout() {
       }}
     >
       <DashboardHeader
-        //logo={<SitemarkIcon />}
         title="Raith"
         menuOpen={isNavigationExpanded}
         onToggleMenu={handleToggleHeaderMenu}
