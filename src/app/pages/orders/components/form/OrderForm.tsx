@@ -61,7 +61,11 @@ export default function OrderForm({ disabled }: { disabled: boolean }) {
           <ProductForm disabled={disabled} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Fechar</Button>
+          {(errors.productsOrders?.length ?? 0) > 0 ? (
+            <></>
+          ) : (
+            <Button onClick={() => setOpen(false)}>Fechar</Button>
+          )}
         </DialogActions>
       </Dialog>
       <Box

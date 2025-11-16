@@ -9,12 +9,14 @@ import {
   IconButton,
   Autocomplete,
   Box,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
   DataGrid,
   GridColDef,
@@ -29,8 +31,12 @@ import { IProduct } from "../../../products/models/Product";
 import { IProductOrder } from "../../models/Order";
 import { IOrderSchema } from "../../services/OrderSchema";
 import { ptPTDataGrid } from "../../../../components/grid/TranslationGrid";
+import { useLoading } from "../../../../context/useLoading/useLoading";
+import { useModal } from "../../../../context/useModal/useModal";
 
 export default function ProductForm({ disabled }: { disabled: boolean }) {
+  const { startLoading, stopLoading } = useLoading();
+  const { showError } = useModal();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [openQuantities, setOpenQuantities] = useState<number | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -38,21 +44,31 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
     pageSize: 10
   });
 
-  const { control, setValue, watch } = useFormContext<IOrderSchema>();
+  const {
+    control,
+    setValue,
+    watch,
+    clearErrors,
+    formState: { errors }
+  } = useFormContext<IOrderSchema>();
   const productOrders = watch("productsOrders") || [];
 
-  const loadProducts = useCallback(async () => {
-    try {
-      const data = await getProducts();
-      setProducts(data);
-    } catch (e) {
-      console.error(e);
-    }
+  const loadData = useCallback(async () => {
+    startLoading();
+    getProducts()
+      .then((data) => {
+        setProducts(data);
+        stopLoading();
+      })
+      .catch((e: Error) => {
+        stopLoading();
+        showError(e.message, "Erro ao tentar carregar produtos");
+      });
   }, []);
 
   useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
+    loadData();
+  }, [loadData]);
 
   const handleAddProduct = () => {
     const newProduct: IProductOrder = {
@@ -95,6 +111,8 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
       shouldValidate: true,
       shouldDirty: true
     });
+
+    clearErrors("productsOrders");
   };
 
   const quantityFields = [
@@ -162,7 +180,15 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
                   );
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} size="small" variant="outlined" />
+                  <TextField
+                    {...params}
+                    size="small"
+                    variant="outlined"
+                    error={!!errors.productsOrders?.[idx]?.productId}
+                    helperText={
+                      errors.productsOrders?.[idx]?.productId?.message
+                    }
+                  />
                 )}
               />
             )}
@@ -173,7 +199,7 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
     {
       field: "description",
       headerName: "Descrição",
-      width: 600,
+      width: 400,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         const idx = params.row.index;
@@ -251,12 +277,12 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
         const idx = params.row.index;
         return (
           <>
-            <Tooltip title="Editar tamanhos">
+            <Tooltip title={`${disabled ? "Ver" : "Editar"} tamanhos`}>
               <IconButton
                 color="primary"
                 onClick={() => setOpenQuantities(idx)}
               >
-                <AddShoppingCartIcon />
+                {disabled ? <ShoppingCartIcon /> : <AddShoppingCartIcon />}
               </IconButton>
             </Tooltip>
             {!disabled && (
@@ -277,7 +303,16 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
 
   return (
     <>
-      <Box display="flex" justifyContent="flex-end" mb={1}>
+      <Box
+        display="flex"
+        justifyContent={!!errors.productsOrders ? "space-between" : "flex-end"}
+        mb={1}
+      >
+        {!!errors.productsOrders && (
+          <Typography variant="body2" color="error" sx={{ mt: 2, mx: 2 }}>
+            {"Existem produtos invalidos."}
+          </Typography>
+        )}
         {!disabled && (
           <Button
             variant="contained"

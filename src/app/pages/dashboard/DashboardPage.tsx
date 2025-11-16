@@ -1,11 +1,7 @@
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import PageViewsBarChart from "./components/PageViewsBarChart";
-import SessionsChart from "./components/SessionsChart";
-import StatCard, { StatCardProps } from "./components/StatCard";
 import PageContainer from "../../components/PageContainer";
 
-const data: StatCardProps[] = [
+/* const data: StatCardProps[] = [
   {
     title: "Users",
     value: "14k",
@@ -48,12 +44,12 @@ const data: StatCardProps[] = [
     ]
   }
 ];
-
+ */
 export default function DashboardPage() {
   return (
     <PageContainer title={"Início"} breadcrumbs={[{ title: "Início" }]}>
       <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-        <Grid
+        {/* <Grid
           container
           spacing={2}
           columns={12}
@@ -70,7 +66,7 @@ export default function DashboardPage() {
           <Grid size={{ xs: 12, md: 6 }}>
             <PageViewsBarChart />
           </Grid>
-        </Grid>
+        </Grid> */}
       </Box>
     </PageContainer>
   );
