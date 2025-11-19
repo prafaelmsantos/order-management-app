@@ -171,7 +171,7 @@ export default function ProductPage() {
       breadcrumbs={breadcrumbs}
       actions={
         <>
-          {mode !== IMode.ADD && (
+          {mode === IMode.PREVIEW && (
             <Button
               variant="contained"
               startIcon={<SimCardDownloadIcon />}
