@@ -9,7 +9,6 @@ import type {} from "@mui/material/themeCssVarsAugmentation";
 import { matchPath, useLocation } from "react-router";
 import DashboardSidebarContext from "../context/DashboardSidebarContext";
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from "./constants";
-import DashboardSidebarHeaderItem from "./DashboardSidebarHeaderItem";
 import {
   getDrawerSxTransitionMixin,
   getDrawerWidthTransitionMixin
@@ -128,7 +127,6 @@ export default function DashboardSidebar({
               width: mini ? MINI_DRAWER_WIDTH : "auto"
             }}
           >
-            <DashboardSidebarHeaderItem></DashboardSidebarHeaderItem>
             {NavItems.map((item, i) => (
               <DashboardSidebarPageItem
                 key={i}
@@ -196,7 +194,7 @@ export default function DashboardSidebar({
         open={expanded}
         onClose={handleSetSidebarExpanded(false)}
         ModalProps={{
-          keepMounted: true // Better open performance on mobile.
+          keepMounted: true
         }}
         sx={{
           display: {

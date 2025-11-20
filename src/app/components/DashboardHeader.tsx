@@ -97,21 +97,35 @@ export default function DashboardHeader({
               <Stack direction="row" alignItems="center">
                 {logo ? <LogoContainer>{logo}</LogoContainer> : null}
                 {title ? (
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      color: (theme.vars ?? theme).palette.primary.main,
-                      fontWeight: "700",
-                      ml: 1,
-                      whiteSpace: "nowrap",
-                      lineHeight: 1
-                    }}
-                  >
-                    {title}
-                  </Typography>
+                  <>
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        color: (theme.vars ?? theme).palette.primary.main,
+                        fontWeight: "700",
+                        ml: 1,
+                        whiteSpace: "nowrap",
+                        lineHeight: 1
+                      }}
+                    >
+                      {title}
+                    </Typography>
+                  </>
                 ) : null}
               </Stack>
             </Link>
+            <Typography
+              sx={{
+                color: (theme.vars ?? theme).palette.primary.main,
+                fontWeight: "100",
+                mx: 1,
+                mt: 1.5,
+                whiteSpace: "nowrap",
+                fontSize: 10
+              }}
+            >
+              v{__APP_VERSION__}
+            </Typography>
           </Stack>
           <Stack
             direction="row"

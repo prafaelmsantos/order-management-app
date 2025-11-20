@@ -82,10 +82,10 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
       oneMonth: 0,
       threeMonths: 0,
       sixMonths: 0,
+      nineMonths: 0,
       twelveMonths: 0,
       eighteenMonths: 0,
       twentyFourMonths: 0,
-      thirtySixMonths: 0,
       oneYear: 0,
       twoYears: 0,
       threeYears: 0,
@@ -120,10 +120,10 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
     { name: "oneMonth", label: "1 Mês" },
     { name: "threeMonths", label: "3 Meses" },
     { name: "sixMonths", label: "6 Meses" },
+    { name: "nineMonths", label: "9 Meses" },
     { name: "twelveMonths", label: "12 Meses" },
     { name: "eighteenMonths", label: "18 Meses" },
     { name: "twentyFourMonths", label: "24 Meses" },
-    { name: "thirtySixMonths", label: "36 Meses" },
     { name: "oneYear", label: "1 Ano" },
     { name: "twoYears", label: "2 Anos" },
     { name: "threeYears", label: "3 Anos" },
@@ -366,6 +366,7 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
                       key={field.name}
                       name={`productsOrders.${idx}.${field.name}` as any}
                       control={control}
+                      disabled={disabled}
                       render={({ field: f }) => (
                         <TextField
                           {...f}

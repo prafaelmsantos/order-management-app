@@ -14,10 +14,10 @@ export const productOrderSchema = z.object({
   oneMonth: z.number().min(0, "Campo inválido."),
   threeMonths: z.number().min(0, "Campo inválido."),
   sixMonths: z.number().min(0, "Campo inválido."),
+  nineMonths: z.number().min(0, "Campo inválido."),
   twelveMonths: z.number().min(0, "Campo inválido."),
   eighteenMonths: z.number().min(0, "Campo inválido."),
   twentyFourMonths: z.number().min(0, "Campo inválido."),
-  thirtySixMonths: z.number().min(0, "Campo inválido."),
 
   oneYear: z.number().min(0, "Campo inválido."),
   twoYears: z.number().min(0, "Campo inválido."),

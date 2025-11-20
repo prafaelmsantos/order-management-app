@@ -13,10 +13,10 @@ export interface IProductOrder {
   oneMonth: number;
   threeMonths: number;
   sixMonths: number;
+  nineMonths: number;
   twelveMonths: number;
   eighteenMonths: number;
   twentyFourMonths: number;
-  thirtySixMonths: number;
 
   oneYear: number;
   twoYears: number;
