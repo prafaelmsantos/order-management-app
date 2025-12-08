@@ -30,7 +30,7 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
               <TextField
                 {...field}
                 required
-                label="Nome Completo"
+                label="Nome"
                 fullWidth
                 variant="outlined"
                 error={!!errors.fullName}
@@ -41,6 +41,40 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
           />
         </Grid>
 
+        <Grid item xs={12} sm={4}>
+          <Controller
+            name="storeName"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Nome da Loja"
+                fullWidth
+                variant="outlined"
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
+      </Grid>
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={8}>
+          <Controller
+            name="paymentMethod"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Método de Pagamento"
+                fullWidth
+                variant="outlined"
+                disabled={disabled}
+              />
+            )}
+          />
+        </Grid>
         <Grid item xs={12} sm={2}>
           <Controller
             name="taxIdentificationNumber"
@@ -49,12 +83,9 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
             render={({ field }) => (
               <TextField
                 {...field}
-                required
                 label="NIF"
                 fullWidth
                 variant="outlined"
-                error={!!errors.taxIdentificationNumber}
-                helperText={errors.taxIdentificationNumber?.message}
                 disabled={disabled}
               />
             )}
@@ -69,12 +100,9 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
             render={({ field }) => (
               <TextField
                 {...field}
-                required
                 label="Contacto"
                 fullWidth
                 variant="outlined"
-                error={!!errors.contact}
-                helperText={errors.contact?.message}
                 disabled={disabled}
               />
             )}

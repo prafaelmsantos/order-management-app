@@ -41,7 +41,7 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
   const [openQuantities, setOpenQuantities] = useState<number | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
-    pageSize: 10
+    pageSize: 11
   });
 
   const {
@@ -329,6 +329,7 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
           rows={rows}
           columns={columns}
           pagination
+          pageSizeOptions={[11]}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           disableRowSelectionOnClick
@@ -356,12 +357,12 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
       <Dialog open={openQuantities !== null} maxWidth="md" fullWidth>
         <DialogTitle>Tamanhos / Quantidades</DialogTitle>
         <DialogContent dividers>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid container spacing={2}>
             {openQuantities !== null &&
-              quantityFields.map((field) => {
+              quantityFields.map((field, i) => {
                 const idx = openQuantities!;
                 return (
-                  <Grid item xs={3}>
+                  <Grid item xs={3} key={i}>
                     <Controller
                       key={field.name}
                       name={`productsOrders.${idx}.${field.name}` as any}

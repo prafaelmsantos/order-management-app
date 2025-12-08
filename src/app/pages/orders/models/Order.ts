@@ -35,7 +35,6 @@ export interface IOrder {
   id?: number;
   customerId: number;
   customer?: ICustomer;
-  paymentMethod: string | null;
   observations: string | null;
   totalQuantity: number;
   totalPrice: number;

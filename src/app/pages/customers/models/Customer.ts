@@ -1,8 +1,10 @@
 export interface ICustomer {
   id?: number;
   fullName: string;
-  taxIdentificationNumber: string;
-  contact: string;
+  storeName: string | null;
+  paymentMethod: string | null;
+  taxIdentificationNumber: string | null;
+  contact: string | null;
   address: string;
   postalCode: string;
   city: string;

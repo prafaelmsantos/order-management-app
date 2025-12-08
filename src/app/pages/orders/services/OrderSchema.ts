@@ -36,7 +36,6 @@ export const orderSchema = z.object({
   id: z.number().optional(),
   customerId: z.number().min(1, "Campo obrigatório."),
   customer: customerSchema.optional(),
-  paymentMethod: z.string().nullable(),
   observations: z.string().nullable(),
   totalQuantity: z.number().min(0, "Campo inválido."),
   totalPrice: z.number().min(0, "Campo inválido."),

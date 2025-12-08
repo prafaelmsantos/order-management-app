@@ -102,6 +102,8 @@ export default function OrderForm({ disabled }: { disabled: boolean }) {
                     setValue("customer", {
                       id: customer.id,
                       fullName: customer.fullName,
+                      storeName: customer.storeName,
+                      paymentMethod: customer.paymentMethod,
                       taxIdentificationNumber: customer.taxIdentificationNumber,
                       contact: customer.contact,
                       address: customer.address,
@@ -187,19 +189,12 @@ export default function OrderForm({ disabled }: { disabled: boolean }) {
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         <Grid item xs={12} sm={6}>
-          <Controller
-            name="paymentMethod"
-            control={control}
-            disabled={disabled}
-            defaultValue=""
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Método de Pagamento"
-                fullWidth
-                variant="outlined"
-              />
-            )}
+          <TextField
+            label="Método de Pagamento"
+            fullWidth
+            variant="outlined"
+            disabled
+            //value={customer.paymentMethod ?? ""}
           />
         </Grid>
 

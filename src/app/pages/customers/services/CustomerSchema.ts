@@ -4,9 +4,13 @@ export const customerSchema = z.object({
   id: z.number().optional(),
   fullName: z.string().trim().min(1, "Campo obrigatório."),
 
-  taxIdentificationNumber: z.string().trim().min(1, "Campo obrigatório."),
+  storeName: z.string().nullable(),
 
-  contact: z.string().trim().min(1, "Campo obrigatório."),
+  paymentMethod: z.string().nullable(),
+
+  taxIdentificationNumber: z.string().nullable(),
+
+  contact: z.string().nullable(),
 
   address: z.string().trim().trim().min(1, "Campo obrigatório."),
 

@@ -47,7 +47,6 @@ export default function OrderPage() {
   const [order, setOrder] = useState<IOrder>({
     id: 0,
     customerId: 0,
-    paymentMethod: null,
     observations: null,
     totalQuantity: 0,
     totalPrice: 0,
@@ -79,8 +78,8 @@ export default function OrderPage() {
         })
         .catch((e: Error) => {
           void handleClose();
-          stopLoading();
           showError(e.message, "Erro ao tentar carregar encomendas");
+          stopLoading();
         });
     } else if (!matchNew) {
       void handleClose();

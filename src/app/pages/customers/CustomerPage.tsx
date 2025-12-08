@@ -44,6 +44,8 @@ export default function CustomerPage() {
   const [customer, setCustomer] = useState<ICustomer>({
     id: 0,
     fullName: "",
+    storeName: "",
+    paymentMethod: "",
     taxIdentificationNumber: "",
     contact: "",
     address: "",
@@ -136,6 +138,7 @@ export default function CustomerPage() {
 
   const handleRollback = () => {
     navigate(`/customers/${customerId}`);
+    void loadData();
   };
 
   const breadcrumbs: Breadcrumb[] = [
