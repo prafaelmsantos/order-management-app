@@ -27,10 +27,9 @@ export default function ProductColumns(): GridColDef<IProductTable>[] {
       minWidth: 70
     },
     {
-      field: ProductKeys.totalOrders,
-      headerName: "Nº Encomendas",
-      flex: 1,
-      minWidth: 70
+      field: ProductKeys.createdDate,
+      headerName: "Data/Hora",
+      width: 200
     }
   ];
 }

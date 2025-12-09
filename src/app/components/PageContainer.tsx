@@ -51,7 +51,7 @@ export default function PageContainer(props: PageContainerProps) {
 
   return (
     <Box
-      sx={{ flex: 1, display: "flex", flexDirection: "column", px: 4, py: 2 }}
+      sx={{ flex: 1, display: "flex", flexDirection: "column", px: 5, py: 1 }}
     >
       <Stack sx={{ flex: 1, my: 2 }} spacing={2}>
         <Stack>

@@ -1,4 +1,3 @@
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import AddIcon from "@mui/icons-material/Add";
@@ -124,16 +123,14 @@ export default function CustomersPage() {
         </Stack>
       }
     >
-      <Box sx={{ flex: 1, width: "100%" }}>
-        <CustomDataGrid
-          columns={CustomerColumns()}
-          rows={customers}
-          loading={loading}
-          handleRowClick={handleRowClick}
-          handleRefresh={handleRefresh}
-          setIdsToDelete={setIdsToDelete}
-        />
-      </Box>
+      <CustomDataGrid
+        columns={CustomerColumns()}
+        rows={customers}
+        loading={loading}
+        handleRowClick={handleRowClick}
+        handleRefresh={handleRefresh}
+        setIdsToDelete={setIdsToDelete}
+      />
     </PageContainer>
   );
 }

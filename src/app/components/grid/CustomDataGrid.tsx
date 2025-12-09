@@ -147,7 +147,7 @@ export default function CustomDataGrid({
   }
 
   return (
-    <Box sx={{ flex: 1, width: "100%" }}>
+    <Box sx={{ flex: 1, width: "100%", height: "100%" }}>
       <DataGrid
         rows={rows}
         columns={columns}

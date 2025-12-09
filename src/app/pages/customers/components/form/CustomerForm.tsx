@@ -3,11 +3,7 @@ import { Divider, Paper, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import { ICustomerSchema } from "../../services/CustomerSchema";
 
-interface ICustomerFormProps {
-  disabled?: boolean;
-}
-
-export default function CustomerForm({ disabled }: ICustomerFormProps) {
+export default function CustomerForm({ disabled }: { disabled: boolean }) {
   const {
     control,
     formState: { errors }
@@ -118,12 +114,9 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
             render={({ field }) => (
               <TextField
                 {...field}
-                required
                 label="Morada"
                 fullWidth
                 variant="outlined"
-                error={!!errors.address}
-                helperText={errors.address?.message}
                 disabled={disabled}
               />
             )}
@@ -138,12 +131,9 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
             render={({ field }) => (
               <TextField
                 {...field}
-                required
                 label="Código Postal"
                 fullWidth
                 variant="outlined"
-                error={!!errors.postalCode}
-                helperText={errors.postalCode?.message}
                 disabled={disabled}
               />
             )}
@@ -158,12 +148,9 @@ export default function CustomerForm({ disabled }: ICustomerFormProps) {
             render={({ field }) => (
               <TextField
                 {...field}
-                required
                 label="Cidade"
                 fullWidth
                 variant="outlined"
-                error={!!errors.city}
-                helperText={errors.city?.message}
                 disabled={disabled}
               />
             )}

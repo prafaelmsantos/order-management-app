@@ -1,21 +1,21 @@
 export interface ICustomer {
-  id?: number;
+  id: number | null;
   fullName: string;
   storeName: string | null;
   paymentMethod: string | null;
   taxIdentificationNumber: string | null;
   contact: string | null;
-  address: string;
-  postalCode: string;
-  city: string;
+  address: string | null;
+  postalCode: string | null;
+  city: string | null;
 }
 
 export interface ICustomerTable {
   id: number;
   fullName: string;
-  taxIdentificationNumber: string;
-  contact: string;
-  fullAddress?: string | null;
+  taxIdentificationNumber: string | null;
+  contact: string | null;
+  fullAddress: string | null;
   totalOrders: number;
 }
 
@@ -24,6 +24,6 @@ export enum CustomerKeys {
   fullName = "fullName",
   taxIdentificationNumber = "taxIdentificationNumber",
   contact = "contact",
-  fullAddress = "fullAddress",
-  totalOrders = "totalOrders"
+  totalOrders = "totalOrders",
+  createdDate = "createdDate"
 }

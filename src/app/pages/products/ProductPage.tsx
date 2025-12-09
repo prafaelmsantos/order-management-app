@@ -11,8 +11,10 @@ import { IProduct } from "./models/Product";
 import EditIcon from "@mui/icons-material/Edit";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   createProduct,
+  deleteProducts,
   getProduct,
   getProductReport,
   updateProduct
@@ -32,7 +34,7 @@ export default function ProductPage() {
 
   const notifications = useNotifications();
   const { startLoading, stopLoading } = useLoading();
-  const { showError } = useModal();
+  const { showError, showWarning } = useModal();
 
   const methods = useForm<IProductSchema>({
     resolver: zodResolver(productSchema),
@@ -132,6 +134,39 @@ export default function ProductPage() {
 
   const handleRollback = () => {
     navigate(`/products/${productId}`);
+    void loadData();
+  };
+
+  const handleDeleteClick = () => {
+    startLoading();
+    deleteProducts([productId ?? 0])
+      .then((data) => {
+        const allSuccess = data.every((x) => x.success);
+        if (allSuccess) {
+          notifications.show("Produto apagado com sucesso.", {
+            severity: "success",
+            autoHideDuration: 5000
+          });
+        } else {
+          showError(
+            data.map((x) => x.message).join("\n"),
+            "Houve um erro ao tentar apagar o produto"
+          );
+        }
+        void handleClose();
+        stopLoading();
+      })
+      .catch((e: Error) => {
+        showError(e.message, "Houve um erro ao tentar apagar o produto");
+        stopLoading();
+      });
+  };
+
+  const handleDeleteModal = () => {
+    showWarning(
+      "Tem a certeza que pretende apagar o produto selecionado?",
+      handleDeleteClick
+    );
   };
 
   const breadcrumbs: Breadcrumb[] = [
@@ -177,18 +212,19 @@ export default function ProductPage() {
               startIcon={<SimCardDownloadIcon />}
               onClick={handleReportProduct}
             >
-              Relatório
+              Descarregar
             </Button>
           )}
 
-          {mode === IMode.EDIT && (
+          {(mode === IMode.EDIT || mode === IMode.PREVIEW) && (
             <Button
-              type="submit"
+              type={mode === IMode.EDIT ? "submit" : undefined}
               variant="contained"
-              onClick={handleRollback}
-              startIcon={<CloseIcon />}
+              color={mode === IMode.PREVIEW ? "error" : "primary"}
+              onClick={mode === IMode.EDIT ? handleRollback : handleDeleteModal}
+              startIcon={mode === IMode.EDIT ? <CloseIcon /> : <DeleteIcon />}
             >
-              Fechar
+              {mode === IMode.EDIT ? "Fechar" : "Apagar"}
             </Button>
           )}
 

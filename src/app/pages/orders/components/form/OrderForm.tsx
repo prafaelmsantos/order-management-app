@@ -20,8 +20,16 @@ import { getCustomers } from "../../../customers/services/CustomerService";
 import { ICustomer } from "../../../customers/models/Customer";
 import ProductForm from "./ProductForm";
 import { useModal } from "../../../../context/useModal/useModal";
+import { IProductOrder } from "../../models/Order";
+import AddIcon from "@mui/icons-material/Add";
 
-export default function OrderForm({ disabled }: { disabled: boolean }) {
+export default function OrderForm({
+  disabled,
+  productOrders: productOrdersWatch
+}: {
+  disabled: boolean;
+  productOrders: IProductOrder[];
+}) {
   const { startLoading, stopLoading } = useLoading();
   const { showError } = useModal();
   const {
@@ -53,18 +61,97 @@ export default function OrderForm({ disabled }: { disabled: boolean }) {
 
   const [open, setOpen] = useState(false);
 
+  const [productOrders, setProductOrders] = useState<IProductOrder[]>([]);
+
+  useEffect(() => {
+    setProductOrders(productOrdersWatch);
+  }, [productOrdersWatch]);
+
+  const validForm = !productOrders.some((x) => x.productId === 0);
+
+  const handleAddProduct = () => {
+    const newProduct: IProductOrder = {
+      id: productOrders.length
+        ? Math.max(...productOrders.map((o) => o.id ?? 0)) + 1
+        : 1,
+      orderId: null,
+      productId: 0,
+      product: {
+        id: 0,
+        reference: "",
+        description: "",
+        unitPrice: 0
+      },
+      unitPrice: 0,
+      color: "",
+      zeroMonths: 0,
+      oneMonth: 0,
+      threeMonths: 0,
+      sixMonths: 0,
+      nineMonths: 0,
+      twelveMonths: 0,
+      eighteenMonths: 0,
+      twentyFourMonths: 0,
+      oneYear: 0,
+      twoYears: 0,
+      threeYears: 0,
+      fourYears: 0,
+      sixYears: 0,
+      eightYears: 0,
+      tenYears: 0,
+      twelveYears: 0,
+      totalQuantity: 0,
+      totalPrice: 0
+    };
+
+    setProductOrders([...productOrders, newProduct]);
+  };
+
   return (
     <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
       <Dialog open={open} maxWidth="xl" fullWidth>
-        <DialogTitle>Lista de Produtos</DialogTitle>
+        <DialogTitle>
+          <Box
+            display="flex"
+            justifyContent={!disabled ? "space-between" : "flex-start"}
+            mb={1}
+          >
+            {"Lista de Produtos"}
+
+            {!disabled && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAddProduct}
+              >
+                Adicionar
+              </Button>
+            )}
+          </Box>
+        </DialogTitle>
         <DialogContent>
-          <ProductForm disabled={disabled} />
+          <ProductForm
+            validForm={validForm}
+            disabled={disabled}
+            productOrders={productOrders}
+            setProductOrders={setProductOrders}
+          />
         </DialogContent>
         <DialogActions>
-          {(errors.productsOrders?.length ?? 0) > 0 ? (
-            <></>
+          {validForm ? (
+            <Button
+              onClick={() => {
+                setValue("productsOrders", productOrders, {
+                  shouldValidate: true,
+                  shouldDirty: true
+                });
+                setOpen(false);
+              }}
+            >
+              Fechar
+            </Button>
           ) : (
-            <Button onClick={() => setOpen(false)}>Fechar</Button>
+            <></>
           )}
         </DialogActions>
       </Dialog>
@@ -112,7 +199,7 @@ export default function OrderForm({ disabled }: { disabled: boolean }) {
                     });
                   } else {
                     onChange(0);
-                    setValue("customer", undefined);
+                    setValue("customer", null);
                   }
                 }}
                 renderInput={(params) => (
@@ -188,15 +275,17 @@ export default function OrderForm({ disabled }: { disabled: boolean }) {
       )}
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Método de Pagamento"
-            fullWidth
-            variant="outlined"
-            disabled
-            //value={customer.paymentMethod ?? ""}
-          />
-        </Grid>
+        {customer && (
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Método de Pagamento"
+              fullWidth
+              variant="outlined"
+              disabled
+              value={customer.paymentMethod ?? ""}
+            />
+          </Grid>
+        )}
 
         <Grid item xs={12} sx={{ mt: 1 }}>
           <Controller

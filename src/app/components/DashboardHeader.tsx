@@ -52,8 +52,8 @@ export default function DashboardHeader({
 
   const getMenuIcon = React.useCallback(
     (isExpanded: boolean) => {
-      const expandMenuActionText = "Expand";
-      const collapseMenuActionText = "Collapse";
+      const expandMenuActionText = "Expandir";
+      const collapseMenuActionText = "Fechar";
 
       return (
         <Tooltip
@@ -124,7 +124,7 @@ export default function DashboardHeader({
                 fontSize: 10
               }}
             >
-              v{__APP_VERSION__}
+              Order Management System {__APP_VERSION__}
             </Typography>
           </Stack>
           <Stack

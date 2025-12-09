@@ -22,7 +22,6 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
           <Controller
             name="reference"
             control={control}
-            disabled={disabled}
             defaultValue=""
             render={({ field }) => (
               <TextField
@@ -33,6 +32,7 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
                 variant="outlined"
                 error={!!errors.reference}
                 helperText={errors.reference?.message}
+                disabled={disabled}
               />
             )}
           />
@@ -42,12 +42,10 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
           <Controller
             name="unitPrice"
             control={control}
-            disabled={disabled}
             defaultValue={0}
             render={({ field }) => (
               <TextField
                 {...field}
-                required
                 label="Preço"
                 type="number"
                 fullWidth
@@ -60,9 +58,10 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
                     startAdornment: (
                       <InputAdornment position="start">€</InputAdornment>
                     ),
-                    inputProps: { step: 1, min: 0 }
+                    inputProps: { step: 0.01, min: 0.0 }
                   }
                 }}
+                disabled={disabled}
               />
             )}
           />
@@ -72,7 +71,6 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
           <Controller
             name="description"
             control={control}
-            disabled={disabled}
             defaultValue=""
             render={({ field }) => (
               <TextField
@@ -86,6 +84,7 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
                 helperText={errors.description?.message}
               />
             )}
+            disabled={disabled}
           />
         </Grid>
       </Grid>

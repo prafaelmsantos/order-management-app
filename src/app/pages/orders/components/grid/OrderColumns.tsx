@@ -28,7 +28,7 @@ export default function OrderColumns(): GridColDef<IOrderTable>[] {
     },
     {
       field: OrderKeys.createdDate,
-      headerName: "Data",
+      headerName: "Data/Hora",
       width: 200
     }
   ];

@@ -13,8 +13,10 @@ import useNotifications from "../../context/useNotifications/useNotifications";
 import { useLoading } from "../../context/useLoading/useLoading";
 import { ICustomer } from "./models/Customer";
 import { customerSchema, ICustomerSchema } from "./services/CustomerSchema";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   createCustomer,
+  deleteCustomers,
   getCustomer,
   updateCustomer
 } from "./services/CustomerService";
@@ -30,7 +32,7 @@ export default function CustomerPage() {
 
   const notifications = useNotifications();
   const { startLoading, stopLoading } = useLoading();
-  const { showError } = useModal();
+  const { showError, showWarning } = useModal();
 
   const methods = useForm<ICustomerSchema>({
     resolver: zodResolver(customerSchema),
@@ -141,6 +143,38 @@ export default function CustomerPage() {
     void loadData();
   };
 
+  const handleDeleteClick = () => {
+    startLoading();
+    deleteCustomers([customerId ?? 0])
+      .then((data) => {
+        const allSuccess = data.every((x) => x.success);
+        if (allSuccess) {
+          notifications.show("Cliente apagado com sucesso.", {
+            severity: "success",
+            autoHideDuration: 5000
+          });
+        } else {
+          showError(
+            data.map((x) => x.message).join("\n"),
+            "Houve um erro ao tentar apagar o cliente"
+          );
+        }
+        void handleClose();
+        stopLoading();
+      })
+      .catch((e: Error) => {
+        showError(e.message, "Houve um erro ao tentar apagar o cliente");
+        stopLoading();
+      });
+  };
+
+  const handleDeleteModal = () => {
+    showWarning(
+      "Tem a certeza que pretende apagar o cliente selecionado?",
+      handleDeleteClick
+    );
+  };
+
   const breadcrumbs: Breadcrumb[] = [
     { title: "Clientes", path: baseUrl },
     ...(mode === IMode.ADD
@@ -165,14 +199,15 @@ export default function CustomerPage() {
       breadcrumbs={breadcrumbs}
       actions={
         <>
-          {mode === IMode.EDIT && (
+          {(mode === IMode.EDIT || mode === IMode.PREVIEW) && (
             <Button
-              type="submit"
+              type={mode === IMode.EDIT ? "submit" : undefined}
               variant="contained"
-              onClick={handleRollback}
-              startIcon={<CloseIcon />}
+              color={mode === IMode.PREVIEW ? "error" : "primary"}
+              onClick={mode === IMode.EDIT ? handleRollback : handleDeleteModal}
+              startIcon={mode === IMode.EDIT ? <CloseIcon /> : <DeleteIcon />}
             >
-              Fechar
+              {mode === IMode.EDIT ? "Fechar" : "Apagar"}
             </Button>
           )}
 

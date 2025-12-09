@@ -1,18 +1,17 @@
 export interface IProduct {
-  id?: number;
+  id: number | null;
   reference: string;
   description: string | null;
   unitPrice: number;
-  createdAt?: Date | null;
 }
 
 export interface IProductTable {
-  id?: number;
+  id: number;
   reference: string;
   description: string | null;
-  unitPrice: number;
+  unitPrice: string;
   totalOrders: number;
-  createdDate?: Date | null;
+  createdDate: string;
 }
 
 export enum ProductKeys {

@@ -8,12 +8,10 @@ import {
   TextField,
   IconButton,
   Autocomplete,
-  Box,
   Tooltip,
   Typography
 } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -24,17 +22,29 @@ import {
   GridPaginationModel,
   gridClasses
 } from "@mui/x-data-grid";
-import { useFormContext, Controller } from "react-hook-form";
 
 import { getProducts } from "../../../products/services/ProductService";
 import { IProduct } from "../../../products/models/Product";
-import { IProductOrder } from "../../models/Order";
-import { IOrderSchema } from "../../services/OrderSchema";
+import {
+  IProductOrder,
+  IProductOrderTable,
+  quantityFields
+} from "../../models/Order";
 import { ptPTDataGrid } from "../../../../components/grid/TranslationGrid";
 import { useLoading } from "../../../../context/useLoading/useLoading";
 import { useModal } from "../../../../context/useModal/useModal";
 
-export default function ProductForm({ disabled }: { disabled: boolean }) {
+export default function ProductForm({
+  validForm,
+  disabled,
+  productOrders,
+  setProductOrders
+}: {
+  validForm: boolean;
+  disabled: boolean;
+  productOrders: IProductOrder[];
+  setProductOrders: React.Dispatch<React.SetStateAction<IProductOrder[]>>;
+}) {
   const { startLoading, stopLoading } = useLoading();
   const { showError } = useModal();
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -43,15 +53,6 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
     page: 0,
     pageSize: 11
   });
-
-  const {
-    control,
-    setValue,
-    watch,
-    clearErrors,
-    formState: { errors }
-  } = useFormContext<IOrderSchema>();
-  const productOrders = watch("productsOrders") || [];
 
   const loadData = useCallback(async () => {
     startLoading();
@@ -70,232 +71,155 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
     loadData();
   }, [loadData]);
 
-  const handleAddProduct = () => {
-    const newProduct: IProductOrder = {
-      id: productOrders.length
-        ? Math.max(...productOrders.map((o) => o.id ?? 0)) + 1
-        : 1,
-      productId: 0,
-      unitPrice: 0,
-      color: "",
-      zeroMonths: 0,
-      oneMonth: 0,
-      threeMonths: 0,
-      sixMonths: 0,
-      nineMonths: 0,
-      twelveMonths: 0,
-      eighteenMonths: 0,
-      twentyFourMonths: 0,
-      oneYear: 0,
-      twoYears: 0,
-      threeYears: 0,
-      fourYears: 0,
-      sixYears: 0,
-      eightYears: 0,
-      tenYears: 0,
-      twelveYears: 0,
-      totalQuantity: 0,
-      totalPrice: 0
-    };
-
-    setValue("productsOrders", [...productOrders, newProduct], {
-      shouldValidate: true,
-      shouldDirty: true
-    });
-  };
-
   const handleRemoveProduct = (index: number) => {
     const newOrders = [...productOrders];
     newOrders.splice(index, 1);
-    setValue("productsOrders", newOrders, {
-      shouldValidate: true,
-      shouldDirty: true
-    });
 
-    clearErrors("productsOrders");
+    setProductOrders(newOrders);
   };
 
-  const quantityFields = [
-    { name: "zeroMonths", label: "0 Meses" },
-    { name: "oneMonth", label: "1 Mês" },
-    { name: "threeMonths", label: "3 Meses" },
-    { name: "sixMonths", label: "6 Meses" },
-    { name: "nineMonths", label: "9 Meses" },
-    { name: "twelveMonths", label: "12 Meses" },
-    { name: "eighteenMonths", label: "18 Meses" },
-    { name: "twentyFourMonths", label: "24 Meses" },
-    { name: "oneYear", label: "1 Ano" },
-    { name: "twoYears", label: "2 Anos" },
-    { name: "threeYears", label: "3 Anos" },
-    { name: "fourYears", label: "4 Anos" },
-    { name: "sixYears", label: "6 Anos" },
-    { name: "eightYears", label: "8 Anos" },
-    { name: "tenYears", label: "10 Anos" },
-    { name: "twelveYears", label: "12 Anos" }
-  ];
-
-  const rows = useMemo(
+  const rows: IProductOrderTable[] = useMemo(
     () =>
-      productOrders.map((order, idx) => ({
-        id: order.id,
-        product: order.productId,
-        description: order.product?.description,
-        color: order.color,
-        unitPrice: order.unitPrice,
-        index: idx
+      productOrders.map((productOrder, index) => ({
+        id: productOrder.id ?? 0,
+        productId: productOrder.productId,
+        productDescription: productOrder.product?.description ?? "",
+        color: productOrder.color ?? "",
+        unitPrice: productOrder.unitPrice,
+        index: index
       })),
     [productOrders]
   );
 
   const columns: GridColDef[] = [
     {
-      field: "product",
+      field: "productId",
       headerName: "Produto",
       width: 250,
       sortable: false,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => {
-        const idx = params.row.index;
-        return (
-          <Controller
-            name={`productsOrders.${idx}.productId`}
-            control={control}
-            render={({ field }) => (
-              <Autocomplete
-                sx={{ mt: 1 }}
-                value={products.find((p) => p.id === field.value) || null}
-                options={products}
-                getOptionLabel={(option) => option.reference}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                disabled={disabled}
-                onChange={(_, value) => {
-                  field.onChange(value?.id ?? 0);
-                  setValue(`productsOrders.${idx}.product`, value || undefined);
-                  setValue(
-                    `productsOrders.${idx}.unitPrice`,
-                    value?.unitPrice ?? 0
-                  );
-                  setValue(
-                    `productsOrders.${idx}.product.description`,
-                    value?.description ?? ""
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    size="small"
-                    variant="outlined"
-                    error={!!errors.productsOrders?.[idx]?.productId}
-                    helperText={
-                      errors.productsOrders?.[idx]?.productId?.message
-                    }
-                  />
-                )}
-              />
+        return disabled ? (
+          products.find((p) => p.id === params.row.productId)?.reference ?? ""
+        ) : (
+          <Autocomplete
+            sx={{ mt: 1 }}
+            value={products.find((p) => p.id === params.row.productId) || null}
+            options={products}
+            getOptionLabel={(option) => option.reference}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            noOptionsText="Sem produtos disponíveis"
+            onChange={(_, value) => {
+              setProductOrders((prev) => {
+                const updatedProductOrders = [...prev];
+                updatedProductOrders[params.row.index] = {
+                  ...updatedProductOrders[params.row.index],
+                  productId: value?.id ?? 0,
+                  product: {
+                    id: value?.id ?? 0,
+                    reference: value?.reference ?? "",
+                    description: value?.description ?? "",
+                    unitPrice: value?.unitPrice ?? 0
+                  },
+                  color: null,
+                  unitPrice: value?.unitPrice ?? 0
+                };
+                return updatedProductOrders;
+              });
+            }}
+            renderInput={(params) => (
+              <TextField {...params} size="small" variant="outlined" />
             )}
           />
         );
       }
     },
     {
-      field: "description",
+      field: "productDescription",
       headerName: "Descrição",
-      width: 400,
+      width: 350,
       sortable: false,
-      renderCell: (params: GridRenderCellParams) => {
-        const idx = params.row.index;
-        return (
-          <Controller
-            name={`productsOrders.${idx}.product.description`}
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size="small"
-                fullWidth
-                sx={{ mt: 1 }}
-                disabled
-              />
-            )}
-          />
-        );
-      }
+      align: "center",
+      headerAlign: "center"
     },
     {
       field: "color",
       headerName: "Cor",
-      width: 200,
+      width: 250,
       sortable: false,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => {
-        const idx = params.row.index;
-        return (
-          <Controller
-            name={`productsOrders.${idx}.color`}
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size="small"
-                fullWidth
-                sx={{ mt: 1 }}
-                disabled={disabled}
-              />
-            )}
+        return disabled ? (
+          (params.row as IProductOrder).color ?? ""
+        ) : (
+          <TextField
+            size="small"
+            fullWidth
+            sx={{ mt: 1 }}
+            value={(params.row as IProductOrder).color ?? ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              setProductOrders((prev) => {
+                const updatedProductOrders = [...prev];
+                updatedProductOrders[params.row.index] = {
+                  ...updatedProductOrders[params.row.index],
+                  color: value
+                };
+                return updatedProductOrders;
+              });
+            }}
           />
         );
       }
+    },
+    {
+      field: "sizes",
+      headerName: "Tamanhos / Quantidades",
+      width: 250,
+      sortable: false,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params: GridRenderCellParams) => (
+        <Tooltip title={disabled ? "Ver" : "Editar"}>
+          <IconButton
+            color="primary"
+            onClick={() => setOpenQuantities(params.row.index)}
+          >
+            {disabled ? <ShoppingCartIcon /> : <AddShoppingCartIcon />}
+          </IconButton>
+        </Tooltip>
+      )
     },
     {
       field: "unitPrice",
       headerName: "Preço Unit. (€)",
-      width: 150,
+      width: 200,
       sortable: false,
-      renderCell: (params: GridRenderCellParams) => {
-        const idx = params.row.index;
-        return (
-          <Controller
-            name={`productsOrders.${idx}.unitPrice`}
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                size="small"
-                fullWidth
-                sx={{ mt: 1 }}
-                disabled
-              />
-            )}
-          />
-        );
-      }
+      align: "center",
+      headerAlign: "center"
     },
     {
       field: "actions",
-      headerName: "Ações",
-      width: 100,
+      headerName: "",
+      width: 150,
       sortable: false,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => {
         const idx = params.row.index;
         return (
-          <>
-            <Tooltip title={`${disabled ? "Ver" : "Editar"} tamanhos`}>
+          !disabled && (
+            <Tooltip title="Remover">
               <IconButton
-                color="primary"
-                onClick={() => setOpenQuantities(idx)}
+                color="error"
+                onClick={() => handleRemoveProduct(idx)}
               >
-                {disabled ? <ShoppingCartIcon /> : <AddShoppingCartIcon />}
+                <DeleteIcon />
               </IconButton>
             </Tooltip>
-            {!disabled && (
-              <Tooltip title="Remover">
-                <IconButton
-                  color="error"
-                  onClick={() => handleRemoveProduct(idx)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </>
+          )
         );
       }
     }
@@ -303,26 +227,11 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
 
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent={!!errors.productsOrders ? "space-between" : "flex-end"}
-        mb={1}
-      >
-        {!!errors.productsOrders && (
-          <Typography variant="body2" color="error" sx={{ mt: 2, mx: 2 }}>
-            {"Existem produtos invalidos."}
-          </Typography>
-        )}
-        {!disabled && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddProduct}
-          >
-            Adicionar
-          </Button>
-        )}
-      </Box>
+      {!validForm && (
+        <Typography variant="body2" color="error" sx={{ mt: 2, mb: 2 }}>
+          {"Existem produtos invalidos."}
+        </Typography>
+      )}
 
       <div style={{ height: 700, width: "100%" }}>
         <DataGrid
@@ -363,22 +272,28 @@ export default function ProductForm({ disabled }: { disabled: boolean }) {
                 const idx = openQuantities!;
                 return (
                   <Grid item xs={3} key={i}>
-                    <Controller
-                      key={field.name}
-                      name={`productsOrders.${idx}.${field.name}` as any}
-                      control={control}
+                    <TextField
+                      label={field.label}
+                      type="number"
+                      size="small"
+                      fullWidth
                       disabled={disabled}
-                      render={({ field: f }) => (
-                        <TextField
-                          {...f}
-                          label={field.label}
-                          type="number"
-                          size="small"
-                          onChange={(e) =>
-                            f.onChange(Math.max(Number(e.target.value), 0))
-                          }
-                        />
-                      )}
+                      value={
+                        productOrders[idx][field.name as keyof IProductOrder] ??
+                        0
+                      }
+                      onChange={(e) => {
+                        const value = Math.max(Number(e.target.value), 0);
+
+                        setProductOrders((prev) => {
+                          const updatedProductOrders = [...prev];
+                          updatedProductOrders[idx] = {
+                            ...updatedProductOrders[idx],
+                            [field.name]: value
+                          };
+                          return updatedProductOrders;
+                        });
+                      }}
                     />
                   </Grid>
                 );

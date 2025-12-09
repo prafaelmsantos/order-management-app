@@ -3,12 +3,12 @@ import { customerSchema } from "../../customers/services/CustomerSchema";
 import { productSchema } from "../../products/services/ProductSchema";
 
 export const productOrderSchema = z.object({
-  id: z.number().optional(),
-  orderId: z.number().optional(),
+  id: z.number().nullable(),
+  orderId: z.number().nullable(),
   productId: z.number().min(1, "Campo obrigatório."),
-  product: productSchema.optional(),
+  product: productSchema.nullable(),
   unitPrice: z.number().min(0, "Campo inválido."),
-  color: z.string().optional(),
+  color: z.string().nullable(),
 
   zeroMonths: z.number().min(0, "Campo inválido."),
   oneMonth: z.number().min(0, "Campo inválido."),
@@ -33,9 +33,9 @@ export const productOrderSchema = z.object({
 });
 
 export const orderSchema = z.object({
-  id: z.number().optional(),
+  id: z.number().nullable(),
   customerId: z.number().min(1, "Campo obrigatório."),
-  customer: customerSchema.optional(),
+  customer: customerSchema.nullable(),
   observations: z.string().nullable(),
   totalQuantity: z.number().min(0, "Campo inválido."),
   totalPrice: z.number().min(0, "Campo inválido."),

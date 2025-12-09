@@ -13,8 +13,10 @@ import useNotifications from "../../context/useNotifications/useNotifications";
 import { useLoading } from "../../context/useLoading/useLoading";
 import { IOrderSchema, orderSchema } from "./services/OrderSchema";
 import { IOrder } from "./models/Order";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   createOrder,
+  deleteOrders,
   getOrder,
   getOrderDoc,
   updateOrder
@@ -31,7 +33,7 @@ export default function OrderPage() {
   const orderId = params.orderId ? Number(params.orderId) : null;
 
   const { startLoading, stopLoading } = useLoading();
-  const { showError } = useModal();
+  const { showError, showWarning } = useModal();
 
   const notifications = useNotifications();
 
@@ -47,6 +49,7 @@ export default function OrderPage() {
   const [order, setOrder] = useState<IOrder>({
     id: 0,
     customerId: 0,
+    customer: null,
     observations: null,
     totalQuantity: 0,
     totalPrice: 0,
@@ -141,6 +144,38 @@ export default function OrderPage() {
     void loadData();
   };
 
+  const handleDeleteClick = () => {
+    startLoading();
+    deleteOrders([orderId ?? 0])
+      .then((data) => {
+        const allSuccess = data.every((x) => x.success);
+        if (allSuccess) {
+          notifications.show("Encomenda apagada com sucesso.", {
+            severity: "success",
+            autoHideDuration: 5000
+          });
+        } else {
+          showError(
+            data.map((x) => x.message).join("\n"),
+            "Houve um erro ao tentar apagar a encomenda"
+          );
+        }
+        void handleClose();
+        stopLoading();
+      })
+      .catch((e: Error) => {
+        showError(e.message, "Houve um erro ao tentar apagar a encomenda");
+        stopLoading();
+      });
+  };
+
+  const handleDeleteModal = () => {
+    showWarning(
+      "Tem a certeza que pretende apagar a encomenda selecionada?",
+      handleDeleteClick
+    );
+  };
+
   const breadcrumbs: Breadcrumb[] = [
     { title: "Encomendas", path: baseUrl },
     ...(mode === IMode.ADD
@@ -191,14 +226,15 @@ export default function OrderPage() {
             </Button>
           )}
 
-          {mode === IMode.EDIT && (
+          {(mode === IMode.EDIT || mode === IMode.PREVIEW) && (
             <Button
-              type="submit"
+              type={mode === IMode.EDIT ? "submit" : undefined}
               variant="contained"
-              onClick={handleRollback}
-              startIcon={<CloseIcon />}
+              color={mode === IMode.PREVIEW ? "error" : "primary"}
+              onClick={mode === IMode.EDIT ? handleRollback : handleDeleteModal}
+              startIcon={mode === IMode.EDIT ? <CloseIcon /> : <DeleteIcon />}
             >
-              Fechar
+              {mode === IMode.EDIT ? "Fechar" : "Apagar"}
             </Button>
           )}
 
@@ -228,7 +264,10 @@ export default function OrderPage() {
       }
     >
       <FormProvider {...methods}>
-        <OrderForm disabled={mode === IMode.PREVIEW} />
+        <OrderForm
+          disabled={mode === IMode.PREVIEW}
+          productOrders={order.productsOrders}
+        />
       </FormProvider>
     </PageContainer>
   );

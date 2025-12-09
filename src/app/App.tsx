@@ -7,7 +7,7 @@ import { ModalProvider } from "./context/useModal/ModalProvider";
 
 const TRIAL_KEY = "trialStart";
 const TRIAL_DAYS = 30;
-const TRIAL_START_DATE = new Date("2025-11-15T00:00:00Z");
+const TRIAL_START_DATE = new Date("2025-11-20T00:00:00Z");
 
 function App() {
   let start = localStorage.getItem(TRIAL_KEY);
