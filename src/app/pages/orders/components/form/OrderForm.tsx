@@ -22,6 +22,7 @@ import ProductForm from "./ProductForm";
 import { useModal } from "../../../../context/useModal/useModal";
 import { IProductOrder } from "../../models/Order";
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function OrderForm({
   disabled,
@@ -116,7 +117,7 @@ export default function OrderForm({
             justifyContent={!disabled ? "space-between" : "flex-start"}
             mb={1}
           >
-            {"Lista de Produtos"}
+            {"Produtos"}
 
             {!disabled && (
               <Button
@@ -138,8 +139,10 @@ export default function OrderForm({
           />
         </DialogContent>
         <DialogActions>
-          {validForm ? (
+          {validForm && (
             <Button
+              variant="contained"
+              startIcon={<CloseIcon />}
               onClick={() => {
                 setValue("productsOrders", productOrders, {
                   shouldValidate: true,
@@ -150,8 +153,15 @@ export default function OrderForm({
             >
               Fechar
             </Button>
-          ) : (
-            <></>
+          )}
+          {!disabled && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddProduct}
+            >
+              Adicionar
+            </Button>
           )}
         </DialogActions>
       </Dialog>

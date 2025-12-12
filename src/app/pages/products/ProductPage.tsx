@@ -106,7 +106,7 @@ export default function ProductPage() {
         void loadData();
       })
       .catch((e: Error) => {
-        showError(e.message, "Erro ao tentar atualizar o cliente");
+        showError(e.message, "Erro ao tentar atualizar o produto");
         stopLoading();
       });
   };
@@ -123,7 +123,7 @@ export default function ProductPage() {
         void handleClose();
       })
       .catch((e: Error) => {
-        showError(e.message, "Erro ao tentar criar o cliente");
+        showError(e.message, "Erro ao tentar criar o produto");
         stopLoading();
       });
   };
@@ -187,7 +187,7 @@ export default function ProductPage() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `relatorio_produto_${productId}.pdf`;
+      link.download = `relatorio_vendas_produto_${product.reference}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();

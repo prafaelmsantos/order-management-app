@@ -51,7 +51,7 @@ export default function ProductForm({
   const [openQuantities, setOpenQuantities] = useState<number | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
-    pageSize: 11
+    pageSize: 8
   });
 
   const loadData = useCallback(async () => {
@@ -95,7 +95,7 @@ export default function ProductForm({
     {
       field: "productId",
       headerName: "Produto",
-      width: 250,
+      width: 200,
       sortable: false,
       align: "center",
       headerAlign: "center",
@@ -146,7 +146,7 @@ export default function ProductForm({
     {
       field: "color",
       headerName: "Cor",
-      width: 250,
+      width: 200,
       sortable: false,
       align: "center",
       headerAlign: "center",
@@ -176,8 +176,8 @@ export default function ProductForm({
     },
     {
       field: "sizes",
-      headerName: "Tamanhos / Quantidades",
-      width: 250,
+      headerName: "",
+      width: 150,
       sortable: false,
       align: "center",
       headerAlign: "center",
@@ -195,7 +195,7 @@ export default function ProductForm({
     {
       field: "unitPrice",
       headerName: "Preço Unit. (€)",
-      width: 200,
+      width: 150,
       sortable: false,
       align: "center",
       headerAlign: "center"
@@ -228,12 +228,12 @@ export default function ProductForm({
   return (
     <>
       {!validForm && (
-        <Typography variant="body2" color="error" sx={{ mt: 2, mb: 2 }}>
+        <Typography variant="body2" color="error" sx={{ mb: 2 }}>
           {"Existem produtos invalidos."}
         </Typography>
       )}
 
-      <div style={{ height: 700, width: "100%" }}>
+      <div style={{ height: 520, width: "100%" }}>
         <DataGrid
           rows={rows}
           columns={columns}
