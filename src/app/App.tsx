@@ -9,7 +9,6 @@ function App() {
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
-
       <NotificationsProvider>
         <LoadingProvider>
           <ModalProvider>
