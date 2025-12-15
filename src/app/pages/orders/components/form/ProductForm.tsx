@@ -8,8 +8,7 @@ import {
   TextField,
   IconButton,
   Autocomplete,
-  Tooltip,
-  Typography
+  Tooltip
 } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -35,12 +34,10 @@ import { useLoading } from "../../../../context/useLoading/useLoading";
 import { useModal } from "../../../../context/useModal/useModal";
 
 export default function ProductForm({
-  validForm,
   disabled,
   productOrders,
   setProductOrders
 }: {
-  validForm: boolean;
   disabled: boolean;
   productOrders: IProductOrder[];
   setProductOrders: React.Dispatch<React.SetStateAction<IProductOrder[]>>;
@@ -51,7 +48,7 @@ export default function ProductForm({
   const [openQuantities, setOpenQuantities] = useState<number | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
-    pageSize: 8
+    pageSize: 15
   });
 
   const loadData = useCallback(async () => {
@@ -104,7 +101,6 @@ export default function ProductForm({
           products.find((p) => p.id === params.row.productId)?.reference ?? ""
         ) : (
           <Autocomplete
-            sx={{ mt: 1 }}
             value={products.find((p) => p.id === params.row.productId) || null}
             options={products}
             getOptionLabel={(option) => option.reference}
@@ -129,7 +125,12 @@ export default function ProductForm({
               });
             }}
             renderInput={(params) => (
-              <TextField {...params} size="small" variant="outlined" />
+              <TextField
+                {...params}
+                sx={{ mt: 0.5 }}
+                size="small"
+                variant="standard"
+              />
             )}
           />
         );
@@ -156,8 +157,9 @@ export default function ProductForm({
         ) : (
           <TextField
             size="small"
+            variant="standard"
             fullWidth
-            sx={{ mt: 1 }}
+            sx={{ mt: 0.5 }}
             value={(params.row as IProductOrder).color ?? ""}
             onChange={(e) => {
               const value = e.target.value;
@@ -213,6 +215,7 @@ export default function ProductForm({
           !disabled && (
             <Tooltip title="Remover">
               <IconButton
+                size="small"
                 color="error"
                 onClick={() => handleRemoveProduct(idx)}
               >
@@ -227,18 +230,13 @@ export default function ProductForm({
 
   return (
     <>
-      {!validForm && (
-        <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-          {"Existem produtos invalidos."}
-        </Typography>
-      )}
-
-      <div style={{ height: 520, width: "100%" }}>
+      <div style={{ height: 550, width: "100%" }}>
         <DataGrid
+          density="compact"
           rows={rows}
           columns={columns}
           pagination
-          pageSizeOptions={[11]}
+          pageSizeOptions={[12]}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           disableRowSelectionOnClick

@@ -211,7 +211,7 @@ export default function OrderPage() {
           ? "Criar Encomenda"
           : mode === IMode.EDIT
           ? "Editar Encomenda"
-          : "Nº" + order.id?.toString()
+          : "Nº" + (order.id ?? 0).toString()
       }
       breadcrumbs={breadcrumbs}
       actions={

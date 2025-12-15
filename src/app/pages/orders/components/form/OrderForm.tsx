@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
@@ -112,58 +111,50 @@ export default function OrderForm({
     <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
       <Dialog open={open} maxWidth="xl" fullWidth>
         <DialogTitle>
-          <Box
-            display="flex"
-            justifyContent={!disabled ? "space-between" : "flex-start"}
-            mb={1}
-          >
+          <Box display="flex" justifyContent={"space-between"}>
             {"Produtos"}
 
-            {!disabled && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddProduct}
-              >
-                Adicionar
-              </Button>
+            {!validForm && (
+              <Typography variant="body2" color="error">
+                {"Existem produtos invalidos."}
+              </Typography>
             )}
+
+            <Box display="flex" gap={1}>
+              {validForm && (
+                <Button
+                  variant="contained"
+                  startIcon={<CloseIcon />}
+                  onClick={() => {
+                    setValue("productsOrders", productOrders, {
+                      shouldValidate: true,
+                      shouldDirty: true
+                    });
+                    setOpen(false);
+                  }}
+                >
+                  Fechar
+                </Button>
+              )}
+              {!disabled && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddProduct}
+                >
+                  Adicionar
+                </Button>
+              )}
+            </Box>
           </Box>
         </DialogTitle>
         <DialogContent>
           <ProductForm
-            validForm={validForm}
             disabled={disabled}
             productOrders={productOrders}
             setProductOrders={setProductOrders}
           />
         </DialogContent>
-        <DialogActions>
-          {validForm && (
-            <Button
-              variant="contained"
-              startIcon={<CloseIcon />}
-              onClick={() => {
-                setValue("productsOrders", productOrders, {
-                  shouldValidate: true,
-                  shouldDirty: true
-                });
-                setOpen(false);
-              }}
-            >
-              Fechar
-            </Button>
-          )}
-          {!disabled && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddProduct}
-            >
-              Adicionar
-            </Button>
-          )}
-        </DialogActions>
       </Dialog>
       <Box
         display="flex"
