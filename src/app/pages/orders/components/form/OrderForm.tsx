@@ -71,9 +71,10 @@ export default function OrderForm({
 
   const handleAddProduct = () => {
     const newProduct: IProductOrder = {
-      id: productOrders.length
-        ? Math.max(...productOrders.map((o) => o.id ?? 0)) + 1
-        : 1,
+      id:
+        productOrders.length > 0
+          ? Math.max(...productOrders.map((o) => o.id ?? 0)) + 1
+          : 1,
       orderId: null,
       productId: 0,
       product: {
@@ -184,6 +185,7 @@ export default function OrderForm({
                 getOptionLabel={(option) => option.fullName ?? ""}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 disabled={disabled}
+                noOptionsText="Sem clientes disponíveis"
                 onChange={(_, customer) => {
                   if (customer) {
                     onChange(customer.id);

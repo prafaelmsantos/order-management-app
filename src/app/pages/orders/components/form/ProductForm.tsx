@@ -32,6 +32,8 @@ import {
 import { ptPTDataGrid } from "../../../../components/grid/TranslationGrid";
 import { useLoading } from "../../../../context/useLoading/useLoading";
 import { useModal } from "../../../../context/useModal/useModal";
+import ProductCell from "./cell/ProductCell";
+import ColorCell from "./cell/ColorCell";
 
 export default function ProductForm({
   disabled,
@@ -68,22 +70,17 @@ export default function ProductForm({
     loadData();
   }, [loadData]);
 
-  const handleRemoveProduct = (index: number) => {
-    const newOrders = [...productOrders];
-    newOrders.splice(index, 1);
-
-    setProductOrders(newOrders);
-  };
+  const handleRemoveProduct = (id: number) =>
+    setProductOrders((prev) => prev.filter((row) => row.id !== id));
 
   const rows: IProductOrderTable[] = useMemo(
     () =>
-      productOrders.map((productOrder, index) => ({
+      productOrders.map((productOrder) => ({
         id: productOrder.id ?? 0,
         productId: productOrder.productId,
         productDescription: productOrder.product?.description ?? "",
         color: productOrder.color ?? "",
-        unitPrice: productOrder.unitPrice,
-        index: index
+        unitPrice: productOrder.unitPrice
       })),
     [productOrders]
   );
@@ -96,45 +93,14 @@ export default function ProductForm({
       sortable: false,
       align: "center",
       headerAlign: "center",
-      renderCell: (params: GridRenderCellParams) => {
-        return disabled ? (
-          products.find((p) => p.id === params.row.productId)?.reference ?? ""
-        ) : (
-          <Autocomplete
-            value={products.find((p) => p.id === params.row.productId) || null}
-            options={products}
-            getOptionLabel={(option) => option.reference}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            noOptionsText="Sem produtos disponíveis"
-            onChange={(_, value) => {
-              setProductOrders((prev) => {
-                const updatedProductOrders = [...prev];
-                updatedProductOrders[params.row.index] = {
-                  ...updatedProductOrders[params.row.index],
-                  productId: value?.id ?? 0,
-                  product: {
-                    id: value?.id ?? 0,
-                    reference: value?.reference ?? "",
-                    description: value?.description ?? "",
-                    unitPrice: value?.unitPrice ?? 0
-                  },
-                  color: null,
-                  unitPrice: value?.unitPrice ?? 0
-                };
-                return updatedProductOrders;
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                sx={{ mt: 0.5 }}
-                size="small"
-                variant="standard"
-              />
-            )}
-          />
-        );
-      }
+      renderCell: (params: GridRenderCellParams) => (
+        <ProductCell
+          params={params}
+          disabled={disabled}
+          products={products}
+          setProductOrders={setProductOrders}
+        />
+      )
     },
     {
       field: "productDescription",
@@ -151,31 +117,15 @@ export default function ProductForm({
       sortable: false,
       align: "center",
       headerAlign: "center",
-      renderCell: (params: GridRenderCellParams) => {
-        return disabled ? (
-          (params.row as IProductOrder).color ?? ""
-        ) : (
-          <TextField
-            size="small"
-            variant="standard"
-            fullWidth
-            sx={{ mt: 0.5 }}
-            value={(params.row as IProductOrder).color ?? ""}
-            onChange={(e) => {
-              const value = e.target.value;
-              setProductOrders((prev) => {
-                const updatedProductOrders = [...prev];
-                updatedProductOrders[params.row.index] = {
-                  ...updatedProductOrders[params.row.index],
-                  color: value
-                };
-                return updatedProductOrders;
-              });
-            }}
-          />
-        );
-      }
+      renderCell: (params: GridRenderCellParams) => (
+        <ColorCell
+          params={params}
+          disabled={disabled}
+          setProductOrders={setProductOrders}
+        />
+      )
     },
+
     {
       field: "sizes",
       headerName: "",
@@ -210,14 +160,13 @@ export default function ProductForm({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => {
-        const idx = params.row.index;
         return (
           !disabled && (
             <Tooltip title="Remover">
               <IconButton
                 size="small"
                 color="error"
-                onClick={() => handleRemoveProduct(idx)}
+                onClick={() => handleRemoveProduct(params.row.id)}
               >
                 <DeleteIcon />
               </IconButton>

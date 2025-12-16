@@ -57,7 +57,6 @@ export interface IProductOrderTable {
   productDescription: string;
   color: string;
   unitPrice: number;
-  index: number;
 }
 
 export enum OrderKeys {
