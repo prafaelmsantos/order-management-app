@@ -1,38 +1,19 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  IconButton,
-  Tooltip
-} from "@mui/material";
-import Grid from "@mui/material/GridLegacy";
+import { IconButton, Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  GridPaginationModel,
-  gridClasses
-} from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 import { getProducts } from "../../../products/services/ProductService";
 import { IProduct } from "../../../products/models/Product";
-import {
-  IProductOrder,
-  IProductOrderTable,
-  quantityFields
-} from "../../models/Order";
-import { ptPTDataGrid } from "../../../../components/grid/TranslationGrid";
+import { IProductOrder, IProductOrderTable } from "../../models/Order";
 import { useLoading } from "../../../../context/useLoading/useLoading";
 import { useModal } from "../../../../context/useModal/useModal";
-import ProductCell from "./cell/ProductCell";
-import ColorCell from "./cell/ColorCell";
+import ProductCell from "../table/cell/ProductCell";
+import ColorCell from "../table/cell/ColorCell";
+import ProductTable from "../table/ProductTable";
+import QuantityDialog from "../dialog/QuantityDialog";
 
 export default function ProductForm({
   disabled,
@@ -47,10 +28,6 @@ export default function ProductForm({
   const { showError } = useModal();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [openQuantities, setOpenQuantities] = useState<number | null>(null);
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: 15
-  });
 
   const loadData = useCallback(async () => {
     startLoading();
@@ -178,86 +155,15 @@ export default function ProductForm({
 
   return (
     <>
-      <div style={{ height: 550, width: "100%" }}>
-        <DataGrid
-          density="compact"
-          rows={rows}
-          columns={columns}
-          pagination
-          pageSizeOptions={[15]}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          disableRowSelectionOnClick
-          disableColumnFilter
-          disableColumnMenu
-          localeText={{
-            ...ptPTDataGrid,
-            paginationDisplayedRows: (params: {
-              from: number;
-              to: number;
-              count: number;
-            }) => `${params.from} de ${params.count}`
-          }}
-          sx={{
-            [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-              outline: "transparent"
-            },
-            [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-              { outline: "none" },
-            [`& .${gridClasses.row}:hover`]: { cursor: "pointer" }
-          }}
-        />
-      </div>
+      <ProductTable rows={rows} columns={columns} />
 
-      <Dialog open={openQuantities !== null} maxWidth="md" fullWidth>
-        <DialogTitle>Tamanhos / Quantidades</DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2}>
-            {openQuantities !== null &&
-              quantityFields.map((field, i) => {
-                return (
-                  <Grid item xs={3} key={i}>
-                    <TextField
-                      label={field.label}
-                      type="number"
-                      size="small"
-                      fullWidth
-                      disabled={disabled}
-                      slotProps={{
-                        input: {
-                          inputProps: { step: 1, min: 0 }
-                        }
-                      }}
-                      value={
-                        productOrders.find(
-                          (row) => row.id === openQuantities
-                        )?.[field.name as keyof IProductOrder] ?? 0
-                      }
-                      onChange={(e) => {
-                        setProductOrders((prev) =>
-                          prev.map((row) =>
-                            row.id === openQuantities
-                              ? {
-                                  ...row,
-                                  [field.name]: Math.max(
-                                    Number(e.target.value),
-                                    0
-                                  )
-                                }
-                              : row
-                          )
-                        );
-                      }}
-                    />
-                  </Grid>
-                );
-              })}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenQuantities(null)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
+      <QuantityDialog
+        disabled={disabled}
+        openQuantities={openQuantities}
+        setOpenQuantities={setOpenQuantities}
+        productOrders={productOrders}
+        setProductOrders={setProductOrders}
+      />
     </>
   );
 }
