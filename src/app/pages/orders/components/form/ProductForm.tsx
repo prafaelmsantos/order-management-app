@@ -105,7 +105,7 @@ export default function ProductForm({
     {
       field: "productDescription",
       headerName: "Descrição",
-      width: 350,
+      width: 300,
       sortable: false,
       align: "center",
       headerAlign: "center"
@@ -129,7 +129,7 @@ export default function ProductForm({
     {
       field: "sizes",
       headerName: "",
-      width: 150,
+      width: 100,
       sortable: false,
       align: "center",
       headerAlign: "center",
