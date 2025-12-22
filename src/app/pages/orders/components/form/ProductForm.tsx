@@ -136,7 +136,7 @@ export default function ProductForm({
         <Tooltip title={disabled ? "Ver" : "Editar"}>
           <IconButton
             color="primary"
-            onClick={() => setOpenQuantities(params.row.index)}
+            onClick={() => setOpenQuantities(params.row.id)}
           >
             {disabled ? <ShoppingCartIcon /> : <AddShoppingCartIcon />}
           </IconButton>
@@ -184,7 +184,7 @@ export default function ProductForm({
           rows={rows}
           columns={columns}
           pagination
-          pageSizeOptions={[12]}
+          pageSizeOptions={[15]}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           disableRowSelectionOnClick
@@ -215,7 +215,6 @@ export default function ProductForm({
           <Grid container spacing={2}>
             {openQuantities !== null &&
               quantityFields.map((field, i) => {
-                const idx = openQuantities!;
                 return (
                   <Grid item xs={3} key={i}>
                     <TextField
@@ -224,21 +223,30 @@ export default function ProductForm({
                       size="small"
                       fullWidth
                       disabled={disabled}
+                      slotProps={{
+                        input: {
+                          inputProps: { step: 1, min: 0 }
+                        }
+                      }}
                       value={
-                        productOrders[idx][field.name as keyof IProductOrder] ??
-                        0
+                        productOrders.find(
+                          (row) => row.id === openQuantities
+                        )?.[field.name as keyof IProductOrder] ?? 0
                       }
                       onChange={(e) => {
-                        const value = Math.max(Number(e.target.value), 0);
-
-                        setProductOrders((prev) => {
-                          const updatedProductOrders = [...prev];
-                          updatedProductOrders[idx] = {
-                            ...updatedProductOrders[idx],
-                            [field.name]: value
-                          };
-                          return updatedProductOrders;
-                        });
+                        setProductOrders((prev) =>
+                          prev.map((row) =>
+                            row.id === openQuantities
+                              ? {
+                                  ...row,
+                                  [field.name]: Math.max(
+                                    Number(e.target.value),
+                                    0
+                                  )
+                                }
+                              : row
+                          )
+                        );
                       }}
                     />
                   </Grid>
