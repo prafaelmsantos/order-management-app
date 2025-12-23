@@ -75,7 +75,7 @@ export default function OrderForm({
         productOrders.length > 0
           ? Math.max(...productOrders.map((o) => o.id ?? 0)) + 1
           : 1,
-      orderId: null,
+      orderId: 0,
       productId: 0,
       product: {
         id: 0,
